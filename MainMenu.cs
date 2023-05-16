@@ -1,3 +1,4 @@
+using BookDealer.CustomControls;
 using Npgsql;
 using System.Configuration;
 using System.Data;
@@ -15,7 +16,14 @@ namespace BookDealer
         public MainMenu()
         {
             InitializeComponent();
-
+            genres1.Visible = false;
+            books1.Visible = false;
+            storage1.Visible = false;
+            listOfBooks1.Visible = false;
+            setsOfBooks1.Visible = false;
+            orders1.Visible = false;
+            supplyContracts1.Visible = false;
+            salesContracts1.Visible = false;
         }
 
         private void Exit_Click(object sender, EventArgs e)
@@ -213,12 +221,14 @@ namespace BookDealer
 
         private void Clientsdb_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
-            for (int i = 0; i< Clientsdb.Rows.Count ; i++ )
+            for (int i = 0; i < Clientsdb.Rows.Count; i++)
             {
                 DataGridViewLinkCell linkCell = new DataGridViewLinkCell();
 
                 Clientsdb[6, i] = linkCell;
             }
         }
+
+
     }
 }
