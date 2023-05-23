@@ -91,6 +91,9 @@
             Booksdb.RowTemplate.Height = 29;
             Booksdb.Size = new Size(914, 302);
             Booksdb.TabIndex = 2;
+            Booksdb.CellContentClick += Booksdb_CellContentClick;
+            Booksdb.CellValueChanged += Booksdb_CellValueChanged;
+            Booksdb.UserAddedRow += Booksdb_UserAddedRow_1;
             // 
             // tableLayoutPanel2
             // 
@@ -117,6 +120,7 @@
             SaveBooksDB.TabIndex = 0;
             SaveBooksDB.Text = "Сохранить отчет";
             SaveBooksDB.UseVisualStyleBackColor = true;
+            SaveBooksDB.Click += SaveBooksDB_Click;
             // 
             // UpdateBooksDB
             // 
@@ -127,6 +131,7 @@
             UpdateBooksDB.TabIndex = 1;
             UpdateBooksDB.Text = "Обновить таблицу";
             UpdateBooksDB.UseVisualStyleBackColor = true;
+            UpdateBooksDB.Click += UpdateBooksDB_Click;
             // 
             // Books
             // 
@@ -135,6 +140,7 @@
             Controls.Add(tableLayoutPanel1);
             Name = "Books";
             Size = new Size(920, 435);
+            Load += Books_Load;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)Booksdb).EndInit();

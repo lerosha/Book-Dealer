@@ -292,6 +292,7 @@
             SaveDataClients.TabIndex = 1;
             SaveDataClients.Text = "Сохранить отчет";
             SaveDataClients.UseVisualStyleBackColor = true;
+            SaveDataClients.Click += SaveDataClients_Click;
             // 
             // tableLayoutPanel3
             // 
@@ -387,6 +388,7 @@
             UpdateDBPublishers.TabIndex = 1;
             UpdateDBPublishers.Text = "Обновить таблицу";
             UpdateDBPublishers.UseVisualStyleBackColor = true;
+            UpdateDBPublishers.Click += UpdateDBPublishers_Click;
             // 
             // SaveDataPublishers
             // 
@@ -397,6 +399,7 @@
             SaveDataPublishers.TabIndex = 2;
             SaveDataPublishers.Text = "Сохранить отчет";
             SaveDataPublishers.UseVisualStyleBackColor = true;
+            SaveDataPublishers.Click += SaveDataPublishers_Click;
             // 
             // Publishersdb
             // 
@@ -408,6 +411,9 @@
             Publishersdb.RowTemplate.Height = 29;
             Publishersdb.Size = new Size(186, 49);
             Publishersdb.TabIndex = 1;
+            Publishersdb.CellContentClick += Publishersdb_CellContentClick;
+            Publishersdb.CellValueChanged += Publishersdb_CellValueChanged;
+            Publishersdb.UserAddedRow += Publishersdb_UserAddedRow;
             // 
             // label3
             // 
@@ -472,6 +478,7 @@
             UpdateDBProviders.TabIndex = 0;
             UpdateDBProviders.Text = "Обновить таблицу";
             UpdateDBProviders.UseVisualStyleBackColor = true;
+            UpdateDBProviders.Click += UpdateDBProviders_Click;
             // 
             // SaveDataProviders
             // 
@@ -482,6 +489,7 @@
             SaveDataProviders.TabIndex = 1;
             SaveDataProviders.Text = "Сохранить отчет";
             SaveDataProviders.UseVisualStyleBackColor = true;
+            SaveDataProviders.Click += SaveDataProviders_Click;
             // 
             // Providersdb
             // 
@@ -493,6 +501,9 @@
             Providersdb.RowTemplate.Height = 29;
             Providersdb.Size = new Size(186, 49);
             Providersdb.TabIndex = 1;
+            Providersdb.CellContentClick += Providersdb_CellContentClick;
+            Providersdb.CellValueChanged += Providersdb_CellValueChanged;
+            Providersdb.UserAddedRow += Providersdb_UserAddedRow;
             // 
             // label4
             // 
@@ -556,16 +567,18 @@
             UpdateDBSellers.TabIndex = 1;
             UpdateDBSellers.Text = "Обновить таблицу";
             UpdateDBSellers.UseVisualStyleBackColor = true;
+            UpdateDBSellers.Click += UpdateDBSellers_Click;
             // 
             // SaveDataSellers
             // 
             SaveDataSellers.Dock = DockStyle.Right;
-            SaveDataSellers.Location = new Point(773, 3);
+            SaveDataSellers.Location = new Point(893, 3);
             SaveDataSellers.Name = "SaveDataSellers";
-            SaveDataSellers.Size = new Size(147, 28);
+            SaveDataSellers.Size = new Size(27, 28);
             SaveDataSellers.TabIndex = 2;
             SaveDataSellers.Text = "Сохранить отчет";
             SaveDataSellers.UseVisualStyleBackColor = true;
+            SaveDataSellers.Click += SaveDataSellers_Click;
             // 
             // label2
             // 
@@ -588,6 +601,9 @@
             Sellersdb.RowTemplate.Height = 29;
             Sellersdb.Size = new Size(923, 354);
             Sellersdb.TabIndex = 2;
+            Sellersdb.CellContentClick += Sellersdb_CellContentClick;
+            Sellersdb.CellValueChanged += Sellersdb_CellValueChanged;
+            Sellersdb.UserAddedRow += Sellersdb_UserAddedRow;
             // 
             // Exit
             // 

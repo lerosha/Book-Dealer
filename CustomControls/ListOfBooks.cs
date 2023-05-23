@@ -24,5 +24,11 @@ namespace BookDealer.CustomControls
             GoodsControl goodsControl = parentForm.Controls.Find("goodsControl1", true).FirstOrDefault() as GoodsControl;
             goodsControl.Visible = true;
         }
+
+
+        private void SaveDataSold_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

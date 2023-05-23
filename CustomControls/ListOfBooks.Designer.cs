@@ -170,6 +170,7 @@
             SaveDataSold.TabIndex = 0;
             SaveDataSold.Text = "Сохранить отчет";
             SaveDataSold.UseVisualStyleBackColor = true;
+            SaveDataSold.Click += SaveDataSold_Click;
             // 
             // UpdateDBSold
             // 

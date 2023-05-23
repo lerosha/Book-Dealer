@@ -91,6 +91,9 @@
             Suppludb.RowTemplate.Height = 29;
             Suppludb.Size = new Size(911, 300);
             Suppludb.TabIndex = 2;
+            Suppludb.CellContentClick += Suppludb_CellContentClick;
+            Suppludb.CellValueChanged += Suppludb_CellValueChanged;
+            Suppludb.UserAddedRow += Suppludb_UserAddedRow;
             // 
             // tableLayoutPanel2
             // 
@@ -117,6 +120,7 @@
             SaveSupplyDB.TabIndex = 0;
             SaveSupplyDB.Text = "Сохранить отчет";
             SaveSupplyDB.UseVisualStyleBackColor = true;
+            SaveSupplyDB.Click += SaveSupplyDB_Click;
             // 
             // UpdateSupplyDB
             // 
@@ -127,6 +131,7 @@
             UpdateSupplyDB.TabIndex = 1;
             UpdateSupplyDB.Text = "Обновить таблицу";
             UpdateSupplyDB.UseVisualStyleBackColor = true;
+            UpdateSupplyDB.Click += UpdateSupplyDB_Click;
             // 
             // SupplyContracts
             // 
@@ -135,6 +140,7 @@
             Controls.Add(tableLayoutPanel1);
             Name = "SupplyContracts";
             Size = new Size(917, 432);
+            Load += SupplyContracts_Load;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)Suppludb).EndInit();

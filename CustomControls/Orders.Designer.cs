@@ -91,6 +91,9 @@
             Setsdb.RowTemplate.Height = 29;
             Setsdb.Size = new Size(917, 304);
             Setsdb.TabIndex = 2;
+            Setsdb.CellContentClick += Setsdb_CellContentClick;
+            Setsdb.CellValueChanged += Setsdb_CellValueChanged;
+            Setsdb.UserAddedRow += Setsdb_UserAddedRow;
             // 
             // tableLayoutPanel2
             // 
@@ -117,6 +120,7 @@
             SaveOrdersDB.TabIndex = 0;
             SaveOrdersDB.Text = "Сохранить отчет";
             SaveOrdersDB.UseVisualStyleBackColor = true;
+            SaveOrdersDB.Click += SaveOrdersDB_Click;
             // 
             // UpdateOrdersDB
             // 
@@ -127,6 +131,7 @@
             UpdateOrdersDB.TabIndex = 1;
             UpdateOrdersDB.Text = "Обновить таблицу";
             UpdateOrdersDB.UseVisualStyleBackColor = true;
+            UpdateOrdersDB.Click += UpdateOrdersDB_Click;
             // 
             // Orders
             // 
@@ -135,6 +140,7 @@
             Controls.Add(tableLayoutPanel1);
             Name = "Orders";
             Size = new Size(923, 438);
+            Load += Orders_Load;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)Setsdb).EndInit();

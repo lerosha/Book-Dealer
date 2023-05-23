@@ -31,12 +31,12 @@
             tableLayoutPanel1 = new TableLayoutPanel();
             label1 = new Label();
             FromSalesButton = new Button();
-            Suppludb = new DataGridView();
+            Salesdb = new DataGridView();
             tableLayoutPanel2 = new TableLayoutPanel();
             SaveSelesDB = new Button();
             UpdateSalesDB = new Button();
             tableLayoutPanel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)Suppludb).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)Salesdb).BeginInit();
             tableLayoutPanel2.SuspendLayout();
             SuspendLayout();
             // 
@@ -46,7 +46,7 @@
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.Controls.Add(label1, 0, 0);
             tableLayoutPanel1.Controls.Add(FromSalesButton, 0, 3);
-            tableLayoutPanel1.Controls.Add(Suppludb, 0, 2);
+            tableLayoutPanel1.Controls.Add(Salesdb, 0, 2);
             tableLayoutPanel1.Controls.Add(tableLayoutPanel2, 0, 1);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
@@ -81,16 +81,19 @@
             FromSalesButton.UseVisualStyleBackColor = true;
             FromSalesButton.Click += FromSalesButton_Click;
             // 
-            // Suppludb
+            // Salesdb
             // 
-            Suppludb.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            Suppludb.Dock = DockStyle.Fill;
-            Suppludb.Location = new Point(3, 92);
-            Suppludb.Name = "Suppludb";
-            Suppludb.RowHeadersWidth = 51;
-            Suppludb.RowTemplate.Height = 29;
-            Suppludb.Size = new Size(917, 304);
-            Suppludb.TabIndex = 2;
+            Salesdb.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            Salesdb.Dock = DockStyle.Fill;
+            Salesdb.Location = new Point(3, 92);
+            Salesdb.Name = "Salesdb";
+            Salesdb.RowHeadersWidth = 51;
+            Salesdb.RowTemplate.Height = 29;
+            Salesdb.Size = new Size(917, 304);
+            Salesdb.TabIndex = 2;
+            Salesdb.CellContentClick += Suppludb_CellContentClick;
+            Salesdb.CellValueChanged += Suppludb_CellValueChanged;
+            Salesdb.UserAddedRow += Suppludb_UserAddedRow;
             // 
             // tableLayoutPanel2
             // 
@@ -117,6 +120,7 @@
             SaveSelesDB.TabIndex = 0;
             SaveSelesDB.Text = "Сохранить отчет";
             SaveSelesDB.UseVisualStyleBackColor = true;
+            SaveSelesDB.Click += SaveSelesDB_Click;
             // 
             // UpdateSalesDB
             // 
@@ -127,6 +131,7 @@
             UpdateSalesDB.TabIndex = 1;
             UpdateSalesDB.Text = "Обновить таблицу";
             UpdateSalesDB.UseVisualStyleBackColor = true;
+            UpdateSalesDB.Click += UpdateSalesDB_Click;
             // 
             // SalesContracts
             // 
@@ -135,9 +140,10 @@
             Controls.Add(tableLayoutPanel1);
             Name = "SalesContracts";
             Size = new Size(923, 438);
+            Load += SalesContracts_Load;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)Suppludb).EndInit();
+            ((System.ComponentModel.ISupportInitialize)Salesdb).EndInit();
             tableLayoutPanel2.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -147,7 +153,7 @@
         private TableLayoutPanel tableLayoutPanel1;
         private Label label1;
         private Button FromSalesButton;
-        private DataGridView Suppludb;
+        private DataGridView Salesdb;
         private TableLayoutPanel tableLayoutPanel2;
         private Button SaveSelesDB;
         private Button UpdateSalesDB;
