@@ -91,6 +91,9 @@
             Storagedb.RowTemplate.Height = 29;
             Storagedb.Size = new Size(917, 304);
             Storagedb.TabIndex = 2;
+            Storagedb.CellContentClick += Storagedb_CellContentClick;
+            Storagedb.CellValueChanged += Storagedb_CellValueChanged;
+            Storagedb.UserAddedRow += Storagedb_UserAddedRow;
             // 
             // tableLayoutPanel2
             // 
@@ -117,6 +120,7 @@
             SaveStorageDB.TabIndex = 0;
             SaveStorageDB.Text = "Сохранить отчет";
             SaveStorageDB.UseVisualStyleBackColor = true;
+            SaveStorageDB.Click += SaveStorageDB_Click;
             // 
             // UpdateStorageDB
             // 
@@ -127,6 +131,7 @@
             UpdateStorageDB.TabIndex = 1;
             UpdateStorageDB.Text = "Обновить таблицу";
             UpdateStorageDB.UseVisualStyleBackColor = true;
+            UpdateStorageDB.Click += UpdateStorageDB_Click;
             // 
             // Storage
             // 
@@ -135,6 +140,7 @@
             Controls.Add(tableLayoutPanel1);
             Name = "Storage";
             Size = new Size(923, 438);
+            Load += Storage_Load;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)Storagedb).EndInit();

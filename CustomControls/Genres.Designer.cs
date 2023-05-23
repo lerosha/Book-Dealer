@@ -88,6 +88,9 @@
             dataGridView1.RowTemplate.Height = 29;
             dataGridView1.Size = new Size(298, 397);
             dataGridView1.TabIndex = 2;
+            dataGridView1.CellContentClick += dataGridView1_CellContentClick;
+            dataGridView1.CellValueChanged += dataGridView1_CellValueChanged;
+            dataGridView1.UserAddedRow += dataGridView1_UserAddedRow;
             // 
             // button2
             // 
@@ -98,6 +101,7 @@
             button2.TabIndex = 4;
             button2.Text = "Обновить таблицу";
             button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
             // 
             // Genres
             // 
@@ -106,6 +110,7 @@
             Controls.Add(tableLayoutPanel1);
             Name = "Genres";
             Size = new Size(961, 567);
+            Load += Genres_Load;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();

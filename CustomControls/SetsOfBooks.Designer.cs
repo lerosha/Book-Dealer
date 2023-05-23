@@ -91,6 +91,9 @@
             Setsdb.RowTemplate.Height = 29;
             Setsdb.Size = new Size(917, 304);
             Setsdb.TabIndex = 2;
+            Setsdb.CellContentClick += Setsdb_CellContentClick;
+            Setsdb.CellValueChanged += Setsdb_CellValueChanged;
+            Setsdb.UserAddedRow += Setsdb_UserAddedRow;
             // 
             // tableLayoutPanel2
             // 
@@ -117,6 +120,7 @@
             SaveSetsDB.TabIndex = 0;
             SaveSetsDB.Text = "Сохранить отчет";
             SaveSetsDB.UseVisualStyleBackColor = true;
+            SaveSetsDB.Click += SaveSetsDB_Click;
             // 
             // UpdateSetsDB
             // 
@@ -127,6 +131,7 @@
             UpdateSetsDB.TabIndex = 1;
             UpdateSetsDB.Text = "Обновить таблицу";
             UpdateSetsDB.UseVisualStyleBackColor = true;
+            UpdateSetsDB.Click += UpdateSetsDB_Click;
             // 
             // SetsOfBooks
             // 
@@ -135,6 +140,7 @@
             Controls.Add(tableLayoutPanel1);
             Name = "SetsOfBooks";
             Size = new Size(923, 438);
+            Load += SetsOfBooks_Load;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)Setsdb).EndInit();
