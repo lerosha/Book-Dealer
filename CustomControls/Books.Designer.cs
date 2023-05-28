@@ -34,7 +34,7 @@
             Booksdb = new DataGridView();
             tableLayoutPanel2 = new TableLayoutPanel();
             SaveBooksDB = new Button();
-            UpdateBooksDB = new Button();
+            button1 = new Button();
             tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)Booksdb).BeginInit();
             tableLayoutPanel2.SuspendLayout();
@@ -87,13 +87,12 @@
             Booksdb.Dock = DockStyle.Fill;
             Booksdb.Location = new Point(3, 92);
             Booksdb.Name = "Booksdb";
+            Booksdb.ReadOnly = true;
             Booksdb.RowHeadersWidth = 51;
             Booksdb.RowTemplate.Height = 29;
             Booksdb.Size = new Size(914, 302);
             Booksdb.TabIndex = 2;
             Booksdb.CellContentClick += Booksdb_CellContentClick;
-            Booksdb.CellValueChanged += Booksdb_CellValueChanged;
-            Booksdb.UserAddedRow += Booksdb_UserAddedRow_1;
             // 
             // tableLayoutPanel2
             // 
@@ -101,7 +100,7 @@
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 82.47F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 17.53F));
             tableLayoutPanel2.Controls.Add(SaveBooksDB, 1, 0);
-            tableLayoutPanel2.Controls.Add(UpdateBooksDB, 0, 0);
+            tableLayoutPanel2.Controls.Add(button1, 0, 0);
             tableLayoutPanel2.Dock = DockStyle.Fill;
             tableLayoutPanel2.Location = new Point(3, 50);
             tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -122,16 +121,16 @@
             SaveBooksDB.UseVisualStyleBackColor = true;
             SaveBooksDB.Click += SaveBooksDB_Click;
             // 
-            // UpdateBooksDB
+            // button1
             // 
-            UpdateBooksDB.Dock = DockStyle.Right;
-            UpdateBooksDB.Location = new Point(602, 3);
-            UpdateBooksDB.Name = "UpdateBooksDB";
-            UpdateBooksDB.Size = new Size(148, 30);
-            UpdateBooksDB.TabIndex = 1;
-            UpdateBooksDB.Text = "Обновить таблицу";
-            UpdateBooksDB.UseVisualStyleBackColor = true;
-            UpdateBooksDB.Click += UpdateBooksDB_Click;
+            button1.Anchor = AnchorStyles.Right;
+            button1.Location = new Point(602, 3);
+            button1.Name = "button1";
+            button1.Size = new Size(148, 29);
+            button1.TabIndex = 1;
+            button1.Text = "Добавить";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // Books
             // 
@@ -156,6 +155,6 @@
         private DataGridView Booksdb;
         private TableLayoutPanel tableLayoutPanel2;
         private Button SaveBooksDB;
-        private Button UpdateBooksDB;
+        private Button button1;
     }
 }
