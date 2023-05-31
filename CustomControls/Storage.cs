@@ -1,5 +1,9 @@
-﻿using Microsoft.VisualBasic;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.VisualBasic;
+using NodaTime;
 using Npgsql;
+using NPOI.XWPF.UserModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,14 +20,9 @@ namespace BookDealer.CustomControls
     public partial class Storage : UserControl
     {
         private NpgsqlConnection? connection = null;
-        private NpgsqlCommandBuilder? commandBuilder = null;
+        //private NpgsqlCommandBuilder? commandBuilder = null;
         private NpgsqlDataAdapter? dataAdapter = null;
         private DataSet? dataSet = null;
-        private string table = "storeroom";
-        private string tableID = "collectbooksid";
-        private int columns = 3;
-
-        private bool newRowAdding = false;
 
         public Storage()
         {
@@ -42,20 +41,24 @@ namespace BookDealer.CustomControls
         {
             try
             {
-                dataAdapter = new NpgsqlDataAdapter("SELECT *, 'Удалить' as delete FROM " + table, connection);
+                string query = "SELECT s.collectbooksid, s.count, b.name AS book, " +
+                    "'Редактировать' AS Edit " +
+               "FROM storeroom AS s " +
+               "JOIN books AS b ON s.bookid = b.bookid";
 
-                commandBuilder = new NpgsqlCommandBuilder(dataAdapter);
-                dataAdapter.UpdateCommand = commandBuilder.GetUpdateCommand();
-                dataAdapter.DeleteCommand = commandBuilder.GetDeleteCommand();
-                dataAdapter.InsertCommand = commandBuilder.GetInsertCommand();
+                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(command);
+                dataAdapter = adapter;
 
                 dataSet = new DataSet();
 
-                dataAdapter.Fill(dataSet, table);
+                dataAdapter.Fill(dataSet, "Result");
 
-                Storagedb.DataSource = dataSet.Tables[table];
-
-                Storagedb.DataBindingComplete += DataBindingComplete;
+                BindingSource bindingSource = new BindingSource();
+                bindingSource.DataSource = dataSet.Tables["Result"];
+                Storagedb.DataSource = bindingSource;
+                Storagedb.Columns["collectbooksid"].Visible = false;
+                Storagedb.Sort(Storagedb.Columns["collectbooksid"], ListSortDirection.Ascending);
 
             }
             catch (Exception ex)
@@ -64,38 +67,101 @@ namespace BookDealer.CustomControls
             }
         }
 
-        public void ReLoadData()
+        private void OpenCustomControl(int storageId)
         {
             try
             {
-                dataSet.Tables[table].Clear();
+                string query = "SELECT s.collectbooksid, s.count, b.name AS book, " +
+                    "'Редактировать' AS Edit " +
+               "FROM storeroom AS s " +
+               "JOIN books AS b ON s.bookid = b.bookid " +
+               "WHERE s.collectbooksid = @collectbooksid";
+                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                command.Parameters.AddWithValue("@collectbooksid", storageId);
+                Storagedb.Columns["collectbooksid"].Visible = false;
 
-                dataAdapter.Fill(dataSet, table);
+                NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(command);
+                DataSet dataSet = new DataSet();
+                adapter.Fill(dataSet, "storeroom");
 
-                Storagedb.DataSource = dataSet.Tables[table];
+                if (dataSet.Tables["storeroom"].Rows.Count > 0)
+                {
+                    // Создать и открыть форму EditDataBooks
+                    var editDataStorage = new EditDataStorage();
+                    editDataStorage.BookName = dataSet.Tables["storeroom"].Rows[0]["book"].ToString();
+                    editDataStorage.CountBook = decimal.Parse(dataSet.Tables["storeroom"].Rows[0]["count"].ToString());
 
-                Storagedb.DataBindingComplete += DataBindingComplete;
+                    // Продолжите добавлять остальные параметры книги в форму EditDataBooks
 
+                    DialogResult result = editDataStorage.ShowDialog();
+
+                    if (result == DialogResult.OK)
+                    {
+                        decimal updatedCount = editDataStorage.CountBook;
+                       
+                        // Обновить базу данных с новыми значениями
+                        string updateQuery = "UPDATE storeroom SET count = @count WHERE collectbooksid = @collectbooksid";
+                        NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
+
+                        updateCommand.Parameters.AddWithValue("@count", updatedCount);
+                        updateCommand.Parameters.AddWithValue("@collectbooksid", storageId);
+                        updateCommand.ExecuteNonQuery();
+
+                        DataRow updatedRow = dataSet.Tables["storeroom"].Rows[0];
+                        updatedRow["count"] = updatedCount;
+
+                        int rowIndex = Storagedb.SelectedCells[0].RowIndex;
+                        DataGridViewRow dataGridViewRow = Storagedb.Rows[rowIndex];
+                        dataGridViewRow.Cells["count"].Value = updatedCount;
+                        // Обновите остальные ячейки в соответствии с обновлениями
+
+                        // Очистите выделение в DataGridView
+                        Storagedb.ClearSelection();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Книга с указанным названием не найдена.", "Ошибка OpenCustomControl!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Ошибка ReLoadData!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "Ошибка OpenCustomControl!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        public void RefreshDataGridView()
         {
-            for (int i = 0; i < Storagedb.Rows.Count; i++)
-            {
-                DataGridViewLinkCell linkCell = new DataGridViewLinkCell();
+            string query = "SELECT s.collectbooksid, s.count, b.name AS book, " +
+                    "'Редактировать' AS Edit " +
+               "FROM storeroom AS s " +
+               "JOIN books AS b ON s.bookid = b.bookid";
 
-                Storagedb[columns, i] = linkCell;
-            }
+            NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(query, connection);
+            DataSet dataSet = new DataSet();
+            adapter.Fill(dataSet, "storeroom");
+
+            // Предполагается, что у вас есть DataGridView с именем BooksDataGridView
+            Storagedb.DataSource = dataSet.Tables["storeroom"];
+            Storagedb.Columns["collectbooksid"].Visible = false;
         }
 
-        private void UpdateStorageDB_Click(object sender, EventArgs e)
+        private void OpenAddDataForm()
         {
-            ReLoadData();
+            var addDataStorage = new AddDataStorage();
+            addDataStorage.DataAdded += AddDataForm_DataAdded;
+            addDataStorage.ShowDialog();
+        }
+        private void AddDataForm_DataAdded(object sender, EventArgs e)
+        {
+            // Обновление данных в DataGridView
+            RefreshDataGridView();
+        }
+
+        private void AddStorageDB_Click(object sender, EventArgs e)
+        {
+            OpenAddDataForm();
+            Storagedb.Sort(Storagedb.Columns["collectbooksid"], ListSortDirection.Ascending);
         }
 
         private void Storage_Load(object sender, EventArgs e)
@@ -106,193 +172,64 @@ namespace BookDealer.CustomControls
             LoadData();
         }
 
-        private void Storagedb_CellValueChanged(object sender, DataGridViewCellEventArgs e)
-        {
-            try
-            {
-                if (newRowAdding == false)
-                {
-                    int rowIndex = Storagedb.SelectedCells[0].RowIndex;
-
-                    DataGridViewRow editingRow = Storagedb.Rows[rowIndex];
-
-                    DataGridViewLinkCell linkCell = new DataGridViewLinkCell();
-
-                    Storagedb[columns, rowIndex] = linkCell;
-
-                    editingRow.Cells["delete"].Value = "Редактировать";
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Ошибка CellValueChanged!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
         private void Storagedb_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             try
             {
-                if (e.ColumnIndex == columns && Storagedb.Rows[e.RowIndex].Cells[columns].Value != null)
+                if (e.RowIndex >= 0 && e.ColumnIndex == Storagedb.Columns["Edit"].Index)
                 {
-                    string task = Storagedb.Rows[e.RowIndex].Cells[columns].Value.ToString();
-                    if (task == "Удалить")
-                    {
-                        if (Storagedb.Columns[e.ColumnIndex].Name == "delete" && e.RowIndex >= 0)
-                        {
-                            if (MessageBox.Show("Вы уверены, что хотите удалить эту запись?", "Удаление", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                            {
-                                int id = (int)Storagedb.Rows[e.RowIndex].Cells[tableID].Value;
-                                using (NpgsqlCommand cmd = new NpgsqlCommand("DELETE FROM " + table + " WHERE " + tableID + " = @" + tableID, connection))
-                                {
-                                    cmd.Parameters.AddWithValue("@" + tableID, id);
-                                    cmd.ExecuteNonQuery();
-                                }
-                                LoadData(); // Обновляем таблицу
-
-                            }
-
-                        }
-                    }
-                    else if (task == "Добавить")
-                    {
-                        int rowIndex = Storagedb.Rows.Count - 2;
-
-                        DataRow row = dataSet.Tables[table].NewRow();
-
-                        row["count"] = Storagedb.Rows[rowIndex].Cells["count"].Value;
-                        row["bookid"] = Storagedb.Rows[rowIndex].Cells["bookid"].Value;
-
-                        dataSet.Tables[table].Rows.Add(row);
-
-                        dataSet.Tables[table].Rows.RemoveAt(dataSet.Tables[table].Rows.Count - 2);
-
-                        Storagedb.Rows.RemoveAt(Storagedb.Rows.Count - 2);
-
-                        Storagedb.Rows[e.RowIndex].Cells[columns].Value = "Удалить";
-
-                        dataAdapter.Update(dataSet, table);
-
-                        newRowAdding = false;
-
-                    }
-                    else if (task == "Редактировать")
-                    {
-                        int r = e.RowIndex;
-
-                        DataRow row = dataSet.Tables[table].Rows[r];
-
-                        row.BeginEdit();
-                        row["count"] = Storagedb.Rows[r].Cells["count"].Value;
-                        row["bookid"] = Storagedb.Rows[r].Cells["bookid"].Value;
-                        row.EndEdit();
-
-                        dataAdapter.Update(dataSet, table);
-                        Storagedb.Rows[e.RowIndex].Cells[columns].Value = "Удалить";
-                        ReLoadData();
-
-                    }
+                    int storageid = (int)Storagedb.Rows[e.RowIndex].Cells["collectbooksid"].Value;
+                    OpenCustomControl(storageid);
                 }
-
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Ошибка CellContentClick!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-        private void Storagedb_UserAddedRow(object sender, DataGridViewRowEventArgs e)
+        public void GenerateWordDocument(DataGridView dataGridView)
         {
-            try
+            // Создание нового документа Word
+            XWPFDocument document = new XWPFDocument();
+
+            // Создание таблицы в документе
+            XWPFTable table = document.CreateTable(dataGridView.Rows.Count, dataGridView.Columns.Count - 1);
+
+            // Заполнение заголовков таблицы
+            XWPFTableRow headerRow = table.GetRow(0);
+            for (int i = 1; i < dataGridView.Columns.Count - 1; i++)
             {
-                if (newRowAdding == false)
-                {
-                    newRowAdding = true;
-
-                    int lastRow = Storagedb.Rows.Count - 2;
-
-                    DataGridViewRow row = Storagedb.Rows[lastRow];
-
-                    DataGridViewLinkCell linkCell = new DataGridViewLinkCell();
-
-                    Storagedb[columns, lastRow] = linkCell;
-
-                    row.Cells["delete"].Value = "Добавить";
-
-                }
-
+                string headerText = dataGridView.Columns[i].HeaderText;
+                headerRow.GetCell(i).SetText(headerText);
             }
-            catch (Exception ex)
+
+            // Заполнение таблицы данными из DataGridView
+            for (int i = 0; i < dataGridView.Rows.Count - 1; i++)
             {
-                MessageBox.Show(ex.Message, "Ошибка UserAddedRow!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                XWPFTableRow row = table.GetRow(i + 1);
+                for (int j = 1; j < dataGridView.Columns.Count - 1; j++)
+                {
+                    string cellValue = dataGridView.Rows[i].Cells[j].Value?.ToString() ?? string.Empty;
+                    row.GetCell(j).SetText(cellValue);
+                }
+            }
+
+            // Отображение диалогового окна выбора пути сохранения файла
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Документ Word (*.docx)|*.docx";
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                // Сохранение документа в выбранный путь
+                using (FileStream fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create, FileAccess.Write))
+                {
+                    document.Write(fileStream);
+                }
             }
         }
 
-        private int[] GetMaxLengths()
-        {
-            int[] maxLengths = new int[Storagedb.Columns.Count];
-
-            for (int i = 0; i < Storagedb.Columns.Count; i++)
-            {
-                int maxLength = Storagedb.Columns[i].HeaderText.Length;
-                foreach (DataGridViewRow row in Storagedb.Rows)
-                {
-                    if (row.Cells[i].Value != null)
-                    {
-                        int cellLength = row.Cells[i].Value.ToString().Length;
-                        if (cellLength > maxLength)
-                        {
-                            maxLength = cellLength;
-                        }
-                    }
-                }
-                maxLengths[i] = maxLength;
-            }
-
-            return maxLengths;
-        }
-
-
-        private void SavetoFile(string filename)
-        {
-            FileStream fs = new FileStream(@"C:\Users\jbunk\Desktop\учебные пособия\базы данных\BookDealer\BookDealer\reports\" + filename, FileMode.Create);
-            StreamWriter streamWriter = new StreamWriter(fs);
-
-            try
-            {
-                int[] maxLengths = GetMaxLengths();
-
-                for (int j = 0; j < Storagedb.Rows.Count; j++)
-                {
-                    for (int i = 0; i < Storagedb.Columns.Count - 1; i++)
-                    {
-                        string cellValue = (Storagedb[i, j].Value ?? "").ToString();
-
-                        string formattedCellValue = string.Format("{0,-" + maxLengths[i] + "}", cellValue);
-
-                        streamWriter.Write(formattedCellValue);
-                        if (i < Storagedb.Columns.Count - 1)
-                        {
-                            streamWriter.Write("    ");
-                        }
-                    }
-                    streamWriter.WriteLine();
-                }
-
-                streamWriter.Close();
-                fs.Close();
-
-                MessageBox.Show("Report saved!");
-            }
-            catch
-            {
-                MessageBox.Show("Cannot save report!");
-            }
-        }
         private void SaveStorageDB_Click(object sender, EventArgs e)
         {
-            string s = Interaction.InputBox("Save as..", "Save", "Storage.txt");
-            SavetoFile(s);
+            GenerateWordDocument(Storagedb);
         }
     }
 }

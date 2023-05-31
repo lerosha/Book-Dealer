@@ -45,7 +45,7 @@
             Clients = new TabPage();
             tableLayoutPanel1 = new TableLayoutPanel();
             tableLayoutPanel2 = new TableLayoutPanel();
-            UpdateDBClient = new Button();
+            AddDBClient = new Button();
             SaveDataClients = new Button();
             tableLayoutPanel3 = new TableLayoutPanel();
             Clientsdb = new DataGridView();
@@ -233,7 +233,7 @@
             Clients.Controls.Add(tableLayoutPanel1);
             Clients.Location = new Point(4, 29);
             Clients.Name = "Clients";
-            Clients.Size = new Size(192, 67);
+            Clients.Size = new Size(929, 444);
             Clients.TabIndex = 2;
             Clients.Text = "Клиенты";
             Clients.UseVisualStyleBackColor = true;
@@ -254,7 +254,7 @@
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 9.237875F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 80.8314056F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel1.Size = new Size(192, 67);
+            tableLayoutPanel1.Size = new Size(929, 444);
             tableLayoutPanel1.TabIndex = 0;
             // 
             // tableLayoutPanel2
@@ -262,33 +262,33 @@
             tableLayoutPanel2.ColumnCount = 2;
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 82.47F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 17.53F));
-            tableLayoutPanel2.Controls.Add(UpdateDBClient, 0, 0);
+            tableLayoutPanel2.Controls.Add(AddDBClient, 0, 0);
             tableLayoutPanel2.Controls.Add(SaveDataClients, 1, 0);
             tableLayoutPanel2.Dock = DockStyle.Fill;
-            tableLayoutPanel2.Location = new Point(3, 9);
+            tableLayoutPanel2.Location = new Point(3, 47);
             tableLayoutPanel2.Name = "tableLayoutPanel2";
             tableLayoutPanel2.RowCount = 1;
             tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel2.Size = new Size(186, 1);
+            tableLayoutPanel2.Size = new Size(923, 34);
             tableLayoutPanel2.TabIndex = 1;
             // 
-            // UpdateDBClient
+            // AddDBClient
             // 
-            UpdateDBClient.Dock = DockStyle.Right;
-            UpdateDBClient.Location = new Point(3, 3);
-            UpdateDBClient.Name = "UpdateDBClient";
-            UpdateDBClient.Size = new Size(147, 1);
-            UpdateDBClient.TabIndex = 0;
-            UpdateDBClient.Text = "Обновить таблицу";
-            UpdateDBClient.UseVisualStyleBackColor = true;
-            UpdateDBClient.Click += UpdateDB_Click;
+            AddDBClient.Dock = DockStyle.Right;
+            AddDBClient.Location = new Point(611, 3);
+            AddDBClient.Name = "AddDBClient";
+            AddDBClient.Size = new Size(147, 28);
+            AddDBClient.TabIndex = 0;
+            AddDBClient.Text = "Добавить";
+            AddDBClient.UseVisualStyleBackColor = true;
+            AddDBClient.Click += AddDBClient_Click;
             // 
             // SaveDataClients
             // 
             SaveDataClients.Dock = DockStyle.Right;
-            SaveDataClients.Location = new Point(156, 3);
+            SaveDataClients.Location = new Point(764, 3);
             SaveDataClients.Name = "SaveDataClients";
-            SaveDataClients.Size = new Size(27, 1);
+            SaveDataClients.Size = new Size(156, 28);
             SaveDataClients.TabIndex = 1;
             SaveDataClients.Text = "Сохранить отчет";
             SaveDataClients.UseVisualStyleBackColor = true;
@@ -301,12 +301,12 @@
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
             tableLayoutPanel3.Controls.Add(Clientsdb, 0, 0);
             tableLayoutPanel3.Dock = DockStyle.Fill;
-            tableLayoutPanel3.Location = new Point(3, 15);
+            tableLayoutPanel3.Location = new Point(3, 87);
             tableLayoutPanel3.Name = "tableLayoutPanel3";
             tableLayoutPanel3.RowCount = 1;
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel3.Size = new Size(186, 49);
+            tableLayoutPanel3.Size = new Size(923, 354);
             tableLayoutPanel3.TabIndex = 2;
             // 
             // Clientsdb
@@ -315,14 +315,12 @@
             Clientsdb.Dock = DockStyle.Fill;
             Clientsdb.Location = new Point(3, 3);
             Clientsdb.Name = "Clientsdb";
+            Clientsdb.ReadOnly = true;
             Clientsdb.RowHeadersWidth = 51;
             Clientsdb.RowTemplate.Height = 29;
-            Clientsdb.Size = new Size(180, 43);
+            Clientsdb.Size = new Size(917, 348);
             Clientsdb.TabIndex = 0;
             Clientsdb.CellContentClick += Clientsdb_CellContentClick;
-            Clientsdb.CellValueChanged += Clientsdb_CellValueChanged;
-            Clientsdb.DataBindingComplete += Clientsdb_DataBindingComplete;
-            Clientsdb.UserAddedRow += Clientsdb_UserAddedRow;
             // 
             // label1
             // 
@@ -330,9 +328,9 @@
             label1.AutoSize = true;
             label1.BackColor = Color.Transparent;
             label1.Font = new Font("Segoe UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.Location = new Point(45, 0);
+            label1.Location = new Point(413, 6);
             label1.Name = "label1";
-            label1.Size = new Size(102, 6);
+            label1.Size = new Size(102, 31);
             label1.TabIndex = 0;
             label1.Text = "Клиенты";
             // 
@@ -388,7 +386,6 @@
             UpdateDBPublishers.TabIndex = 1;
             UpdateDBPublishers.Text = "Обновить таблицу";
             UpdateDBPublishers.UseVisualStyleBackColor = true;
-            UpdateDBPublishers.Click += UpdateDBPublishers_Click;
             // 
             // SaveDataPublishers
             // 
@@ -412,8 +409,6 @@
             Publishersdb.Size = new Size(186, 49);
             Publishersdb.TabIndex = 1;
             Publishersdb.CellContentClick += Publishersdb_CellContentClick;
-            Publishersdb.CellValueChanged += Publishersdb_CellValueChanged;
-            Publishersdb.UserAddedRow += Publishersdb_UserAddedRow;
             // 
             // label3
             // 
@@ -478,7 +473,6 @@
             UpdateDBProviders.TabIndex = 0;
             UpdateDBProviders.Text = "Обновить таблицу";
             UpdateDBProviders.UseVisualStyleBackColor = true;
-            UpdateDBProviders.Click += UpdateDBProviders_Click;
             // 
             // SaveDataProviders
             // 
@@ -502,8 +496,6 @@
             Providersdb.Size = new Size(186, 49);
             Providersdb.TabIndex = 1;
             Providersdb.CellContentClick += Providersdb_CellContentClick;
-            Providersdb.CellValueChanged += Providersdb_CellValueChanged;
-            Providersdb.UserAddedRow += Providersdb_UserAddedRow;
             // 
             // label4
             // 
@@ -521,7 +513,7 @@
             Sellers.Controls.Add(tableLayoutPanel4);
             Sellers.Location = new Point(4, 29);
             Sellers.Name = "Sellers";
-            Sellers.Size = new Size(929, 444);
+            Sellers.Size = new Size(192, 67);
             Sellers.TabIndex = 5;
             Sellers.Text = "Продавцы";
             Sellers.UseVisualStyleBackColor = true;
@@ -540,7 +532,7 @@
             tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 9.993005F));
             tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 9.233537F));
             tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 80.77346F));
-            tableLayoutPanel4.Size = new Size(929, 444);
+            tableLayoutPanel4.Size = new Size(192, 67);
             tableLayoutPanel4.TabIndex = 0;
             // 
             // tableLayoutPanel5
@@ -551,30 +543,29 @@
             tableLayoutPanel5.Controls.Add(UpdateDBSellers, 0, 0);
             tableLayoutPanel5.Controls.Add(SaveDataSellers, 1, 0);
             tableLayoutPanel5.Dock = DockStyle.Fill;
-            tableLayoutPanel5.Location = new Point(3, 47);
+            tableLayoutPanel5.Location = new Point(3, 9);
             tableLayoutPanel5.Name = "tableLayoutPanel5";
             tableLayoutPanel5.RowCount = 1;
             tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel5.Size = new Size(923, 34);
+            tableLayoutPanel5.Size = new Size(186, 1);
             tableLayoutPanel5.TabIndex = 0;
             // 
             // UpdateDBSellers
             // 
             UpdateDBSellers.Dock = DockStyle.Right;
-            UpdateDBSellers.Location = new Point(611, 3);
+            UpdateDBSellers.Location = new Point(3, 3);
             UpdateDBSellers.Name = "UpdateDBSellers";
-            UpdateDBSellers.Size = new Size(147, 28);
+            UpdateDBSellers.Size = new Size(147, 1);
             UpdateDBSellers.TabIndex = 1;
             UpdateDBSellers.Text = "Обновить таблицу";
             UpdateDBSellers.UseVisualStyleBackColor = true;
-            UpdateDBSellers.Click += UpdateDBSellers_Click;
             // 
             // SaveDataSellers
             // 
             SaveDataSellers.Dock = DockStyle.Right;
-            SaveDataSellers.Location = new Point(893, 3);
+            SaveDataSellers.Location = new Point(156, 3);
             SaveDataSellers.Name = "SaveDataSellers";
-            SaveDataSellers.Size = new Size(27, 28);
+            SaveDataSellers.Size = new Size(27, 1);
             SaveDataSellers.TabIndex = 2;
             SaveDataSellers.Text = "Сохранить отчет";
             SaveDataSellers.UseVisualStyleBackColor = true;
@@ -585,9 +576,9 @@
             label2.Anchor = AnchorStyles.None;
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point);
-            label2.Location = new Point(402, 6);
+            label2.Location = new Point(34, 0);
             label2.Name = "label2";
-            label2.Size = new Size(124, 31);
+            label2.Size = new Size(124, 6);
             label2.TabIndex = 1;
             label2.Text = "Продавцы";
             // 
@@ -595,15 +586,13 @@
             // 
             Sellersdb.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             Sellersdb.Dock = DockStyle.Fill;
-            Sellersdb.Location = new Point(3, 87);
+            Sellersdb.Location = new Point(3, 15);
             Sellersdb.Name = "Sellersdb";
             Sellersdb.RowHeadersWidth = 51;
             Sellersdb.RowTemplate.Height = 29;
-            Sellersdb.Size = new Size(923, 354);
+            Sellersdb.Size = new Size(186, 49);
             Sellersdb.TabIndex = 2;
             Sellersdb.CellContentClick += Sellersdb_CellContentClick;
-            Sellersdb.CellValueChanged += Sellersdb_CellValueChanged;
-            Sellersdb.UserAddedRow += Sellersdb_UserAddedRow;
             // 
             // Exit
             // 
@@ -663,7 +652,7 @@
         private TabPage Clients;
         private TableLayoutPanel tableLayoutPanel1;
         private TableLayoutPanel tableLayoutPanel2;
-        private Button UpdateDBClient;
+        private Button AddDBClient;
         private TableLayoutPanel tableLayoutPanel3;
         private DataGridView Clientsdb;
         private Label label1;

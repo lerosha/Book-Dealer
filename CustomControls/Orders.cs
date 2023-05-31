@@ -1,29 +1,29 @@
 ﻿using Microsoft.VisualBasic;
 using Npgsql;
+using NodaTime;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using NodaTime.Text;
+using NPOI.XWPF.UserModel;
 
 namespace BookDealer.CustomControls
 {
     public partial class Orders : UserControl
     {
         private NpgsqlConnection? connection = null;
-        private NpgsqlCommandBuilder? commandBuilder = null;
+        //private NpgsqlCommandBuilder? commandBuilder = null;
         private NpgsqlDataAdapter? dataAdapter = null;
         private DataSet? dataSet = null;
-        private string table = "orders";
-        private string tableID = "orderid";
-        private int columns = 6;
 
-        private bool newRowAdding = false;
         public Orders()
         {
             InitializeComponent();
@@ -41,60 +41,30 @@ namespace BookDealer.CustomControls
         {
             try
             {
-                dataAdapter = new NpgsqlDataAdapter("SELECT *, 'Удалить' as delete FROM " + table, connection);
+                string query = "SELECT o.orderid, o.date, o.count, o.sum, s.information AS salescontract, b.name AS book, " +
+                    "'Редактировать' AS Edit " +
+               "FROM orders AS o " +
+               "JOIN salescontracts AS s ON o.contractid = s.contractid " +
+               "JOIN books AS b ON o.bookid = b.bookid";
 
-                commandBuilder = new NpgsqlCommandBuilder(dataAdapter);
-                dataAdapter.UpdateCommand = commandBuilder.GetUpdateCommand();
-                dataAdapter.DeleteCommand = commandBuilder.GetDeleteCommand();
-                dataAdapter.InsertCommand = commandBuilder.GetInsertCommand();
+                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(command);
+                dataAdapter = adapter;
 
                 dataSet = new DataSet();
 
-                dataAdapter.Fill(dataSet, table);
+                dataAdapter.Fill(dataSet, "Result");
 
-                Setsdb.DataSource = dataSet.Tables[table];
-
-                Setsdb.DataBindingComplete += DataBindingComplete;
+                BindingSource bindingSource = new BindingSource();
+                bindingSource.DataSource = dataSet.Tables["Result"];
+                Setsdb.DataSource = bindingSource;
+                Setsdb.Sort(Setsdb.Columns["orderid"], ListSortDirection.Ascending);
 
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Ошибка LoadData!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-
-        public void ReLoadData()
-        {
-            try
-            {
-                dataSet.Tables[table].Clear();
-
-                dataAdapter.Fill(dataSet, table);
-
-                Setsdb.DataSource = dataSet.Tables[table];
-
-                Setsdb.DataBindingComplete += DataBindingComplete;
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Ошибка ReLoadData!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
-        {
-            for (int i = 0; i < Setsdb.Rows.Count; i++)
-            {
-                DataGridViewLinkCell linkCell = new DataGridViewLinkCell();
-
-                Setsdb[columns, i] = linkCell;
-            }
-        }
-
-        private void UpdateOrdersDB_Click(object sender, EventArgs e)
-        {
-            ReLoadData();
         }
 
         private void Orders_Load(object sender, EventArgs e)
@@ -105,53 +75,85 @@ namespace BookDealer.CustomControls
             LoadData();
         }
 
-        private void Setsdb_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        private void OpenCustomControl(int orderId)
         {
             try
             {
-                if (newRowAdding == false)
+                string query = "SELECT o.orderid, o.date, o.count, o.sum, s.information AS salescontract, b.name AS book, " +
+                    "'Редактировать' AS Edit " +
+               "FROM orders AS o " +
+               "JOIN salescontracts AS s ON o.contractid = s.contractid " +
+               "JOIN books AS b ON o.bookid = b.bookid " +
+               "WHERE o.orderid = @orderid";
+                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                command.Parameters.AddWithValue("@orderid", orderId);
+
+                NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(command);
+                DataSet dataSet = new DataSet();
+                adapter.Fill(dataSet, "orders");
+
+                if (dataSet.Tables["orders"].Rows.Count > 0)
                 {
-                    int rowIndex = Setsdb.SelectedCells[0].RowIndex;
+                    // Создать и открыть форму EditDataBooks
+                    var editDataOrders = new EditDataOrders();
+                    editDataOrders.OrderName = orderId;
+                    string dateString = dataSet.Tables["orders"].Rows[0]["date"].ToString();
+                    DateTime databaseDateTime = DateTime.Parse(dateString);
+                    DateTime databaseDateOnly = databaseDateTime.Date;
 
-                    DataGridViewRow editingRow = Setsdb.Rows[rowIndex];
+                    LocalDate parsedDate = LocalDate.FromDateTime(databaseDateOnly);
+                    editDataOrders.Date = parsedDate.ToDateTimeUnspecified();
+                    editDataOrders.Count = decimal.Parse(dataSet.Tables["orders"].Rows[0]["count"].ToString());
+                    editDataOrders.Sum = decimal.Parse(dataSet.Tables["orders"].Rows[0]["sum"].ToString());
+                    editDataOrders.Contract = dataSet.Tables["orders"].Rows[0]["salescontract"].ToString();
+                    editDataOrders.BookName = dataSet.Tables["orders"].Rows[0]["book"].ToString();
+                    // Продолжите добавлять остальные параметры книги в форму EditDataBooks
 
-                    DataGridViewLinkCell linkCell = new DataGridViewLinkCell();
+                    DialogResult result = editDataOrders.ShowDialog();
 
-                    Setsdb[columns, rowIndex] = linkCell;
+                    if (result == DialogResult.OK)
+                    {
+                        // Получить обновленную дату из формы EditDataOrders
+                        DateTime updatedDateTime = editDataOrders.Date;
 
-                    editingRow.Cells["delete"].Value = "Редактировать";
+                        // Преобразовать дату в тип LocalDate
+                        LocalDate updatedDate = LocalDate.FromDateTime(updatedDateTime);
+                        decimal updatedCount = editDataOrders.Count;
+                        decimal updatedSum = editDataOrders.Sum;
+
+                        // Обновить базу данных с новыми значениями
+                        string updateQuery = "UPDATE orders SET date = @date, count = @count, sum = @sum WHERE orderid = @orderid";
+                        NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
+                        updateCommand.Parameters.AddWithValue("@date", updatedDate.ToDateTimeUnspecified());
+                        updateCommand.Parameters.AddWithValue("@count", updatedCount);
+                        updateCommand.Parameters.AddWithValue("@sum", updatedSum);
+                        updateCommand.Parameters.AddWithValue("@orderid", orderId);
+                        updateCommand.ExecuteNonQuery();
+
+                        DataRow updatedRow = dataSet.Tables["orders"].Rows[0];
+                        updatedRow["date"] = updatedDate.ToDateTimeUnspecified();
+                        updatedRow["count"] = updatedCount;
+                        updatedRow["sum"] = updatedSum;
+
+                        int rowIndex = Setsdb.SelectedCells[0].RowIndex;
+                        DataGridViewRow dataGridViewRow = Setsdb.Rows[rowIndex];
+                        dataGridViewRow.Cells["date"].Value = updatedDate.ToDateTimeUnspecified();
+                        dataGridViewRow.Cells["count"].Value = updatedCount;
+                        dataGridViewRow.Cells["sum"].Value = updatedSum;
+                        // Обновите остальные ячейки в соответствии с обновлениями
+
+                        // Очистите выделение в DataGridView
+                        Setsdb.ClearSelection();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Книга с указанным названием не найдена.", "Ошибка OpenCustomControl!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Ошибка CellValueChanged!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void Setsdb_UserAddedRow(object sender, DataGridViewRowEventArgs e)
-        {
-            try
-            {
-                if (newRowAdding == false)
-                {
-                    newRowAdding = true;
-
-                    int lastRow = Setsdb.Rows.Count - 2;
-
-                    DataGridViewRow row = Setsdb.Rows[lastRow];
-
-                    DataGridViewLinkCell linkCell = new DataGridViewLinkCell();
-
-                    Setsdb[columns, lastRow] = linkCell;
-
-                    row.Cells["delete"].Value = "Добавить";
-
-                }
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Ошибка UserAddedRow!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "Ошибка OpenCustomControl!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -159,73 +161,11 @@ namespace BookDealer.CustomControls
         {
             try
             {
-                if (e.ColumnIndex == columns && Setsdb.Rows[e.RowIndex].Cells[columns].Value != null)
+                if (e.RowIndex >= 0 && e.ColumnIndex == Setsdb.Columns["Edit"].Index)
                 {
-                    string task = Setsdb.Rows[e.RowIndex].Cells[columns].Value.ToString();
-                    if (task == "Удалить")
-                    {
-                        if (Setsdb.Columns[e.ColumnIndex].Name == "delete" && e.RowIndex >= 0)
-                        {
-                            if (MessageBox.Show("Вы уверены, что хотите удалить эту запись?", "Удаление", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                            {
-                                int id = (int)Setsdb.Rows[e.RowIndex].Cells[tableID].Value;
-                                using (NpgsqlCommand cmd = new NpgsqlCommand("DELETE FROM " + table + " WHERE " + tableID + " = @" + tableID, connection))
-                                {
-                                    cmd.Parameters.AddWithValue("@" + tableID, id);
-                                    cmd.ExecuteNonQuery();
-                                }
-                                LoadData(); // Обновляем таблицу
-
-                            }
-
-                        }
-                    }
-                    else if (task == "Добавить")
-                    {
-                        int rowIndex = Setsdb.Rows.Count - 2;
-
-                        DataRow row = dataSet.Tables[table].NewRow();
-
-                        row["date"] = Setsdb.Rows[rowIndex].Cells["date"].Value;
-                        row["count"] = Setsdb.Rows[rowIndex].Cells["count"].Value;
-                        row["sum"] = Setsdb.Rows[rowIndex].Cells["sum"].Value;
-                        row["contractid"] = Setsdb.Rows[rowIndex].Cells["contractid"].Value;
-                        row["bookid"] = Setsdb.Rows[rowIndex].Cells["bookid"].Value;
-
-                        dataSet.Tables[table].Rows.Add(row);
-
-                        dataSet.Tables[table].Rows.RemoveAt(dataSet.Tables[table].Rows.Count - 2);
-
-                        Setsdb.Rows.RemoveAt(Setsdb.Rows.Count - 2);
-
-                        Setsdb.Rows[e.RowIndex].Cells[columns].Value = "Удалить";
-
-                        dataAdapter.Update(dataSet, table);
-
-                        newRowAdding = false;
-
-                    }
-                    else if (task == "Редактировать")
-                    {
-                        int r = e.RowIndex;
-
-                        DataRow row = dataSet.Tables[table].Rows[r];
-
-                        row.BeginEdit();
-                        row["name"] = Setsdb.Rows[r].Cells["name"].Value;
-                        row["count"] = Setsdb.Rows[r].Cells["count"].Value;
-                        row["sum"] = Setsdb.Rows[r].Cells["sum"].Value;
-                        row["contractid"] = Setsdb.Rows[r].Cells["contractid"].Value;
-                        row["bookid"] = Setsdb.Rows[r].Cells["bookid"].Value;
-                        row.EndEdit();
-
-                        dataAdapter.Update(dataSet, table);
-                        Setsdb.Rows[e.RowIndex].Cells[columns].Value = "Удалить";
-                        ReLoadData();
-
-                    }
+                    int orderId = (int)Setsdb.Rows[e.RowIndex].Cells["orderid"].Value;
+                    OpenCustomControl(orderId);
                 }
-
             }
             catch (Exception ex)
             {
@@ -233,72 +173,83 @@ namespace BookDealer.CustomControls
             }
         }
 
-        private int[] GetMaxLengths()
+        public void GenerateWordDocument(DataGridView dataGridView)
         {
-            int[] maxLengths = new int[Setsdb.Columns.Count];
+            // Создание нового документа Word
+            XWPFDocument document = new XWPFDocument();
 
-            for (int i = 0; i < Setsdb.Columns.Count; i++)
+            // Создание таблицы в документе
+            XWPFTable table = document.CreateTable(dataGridView.Rows.Count, dataGridView.Columns.Count - 1);
+
+            // Заполнение заголовков таблицы
+            XWPFTableRow headerRow = table.GetRow(0);
+            for (int i = 0; i < dataGridView.Columns.Count - 1; i++)
             {
-                int maxLength = Setsdb.Columns[i].HeaderText.Length;
-                foreach (DataGridViewRow row in Setsdb.Rows)
-                {
-                    if (row.Cells[i].Value != null)
-                    {
-                        int cellLength = row.Cells[i].Value.ToString().Length;
-                        if (cellLength > maxLength)
-                        {
-                            maxLength = cellLength;
-                        }
-                    }
-                }
-                maxLengths[i] = maxLength;
+                string headerText = dataGridView.Columns[i].HeaderText;
+                headerRow.GetCell(i).SetText(headerText);
             }
 
-            return maxLengths;
-        }
-
-
-        private void SavetoFile(string filename)
-        {
-            FileStream fs = new FileStream(@"C:\Users\jbunk\Desktop\учебные пособия\базы данных\BookDealer\BookDealer\reports\" + filename, FileMode.Create);
-            StreamWriter streamWriter = new StreamWriter(fs);
-
-            try
+            // Заполнение таблицы данными из DataGridView
+            for (int i = 0; i < dataGridView.Rows.Count - 1; i++)
             {
-                int[] maxLengths = GetMaxLengths();
-
-                for (int j = 0; j < Setsdb.Rows.Count; j++)
+                XWPFTableRow row = table.GetRow(i + 1);
+                for (int j = 0; j < dataGridView.Columns.Count - 1; j++)
                 {
-                    for (int i = 0; i < Setsdb.Columns.Count - 1; i++)
-                    {
-                        string cellValue = (Setsdb[i, j].Value ?? "").ToString();
-
-                        string formattedCellValue = string.Format("{0,-" + maxLengths[i] + "}", cellValue);
-
-                        streamWriter.Write(formattedCellValue);
-                        if (i < Setsdb.Columns.Count - 1)
-                        {
-                            streamWriter.Write("    ");
-                        }
-                    }
-                    streamWriter.WriteLine();
+                    string cellValue = dataGridView.Rows[i].Cells[j].Value?.ToString() ?? string.Empty;
+                    row.GetCell(j).SetText(cellValue);
                 }
-
-                streamWriter.Close();
-                fs.Close();
-
-                MessageBox.Show("Report saved!");
             }
-            catch
+
+            // Отображение диалогового окна выбора пути сохранения файла
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Документ Word (*.docx)|*.docx";
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                MessageBox.Show("Cannot save report!");
+                // Сохранение документа в выбранный путь
+                using (FileStream fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create, FileAccess.Write))
+                {
+                    document.Write(fileStream);
+                }
             }
         }
 
         private void SaveOrdersDB_Click(object sender, EventArgs e)
         {
-            string s = Interaction.InputBox("Save as..", "Save", "Orders.txt");
-            SavetoFile(s);
+            GenerateWordDocument(Setsdb);
+        }
+        public void RefreshDataGridView()
+        {
+            string query = "SELECT o.orderid, o.date, o.count, o.sum, s.information AS salescontract, b.name AS book, " +
+                    "'Редактировать' AS Edit " +
+               "FROM orders AS o " +
+               "JOIN salescontracts AS s ON o.contractid = s.contractid " +
+               "JOIN books AS b ON o.bookid = b.bookid";
+
+            NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(query, connection);
+            DataSet dataSet = new DataSet();
+            adapter.Fill(dataSet, "orders");
+
+            // Предполагается, что у вас есть DataGridView с именем BooksDataGridView
+            Setsdb.DataSource = dataSet.Tables["orders"];
+        }
+
+        private void OpenAddDataOrders()
+        {
+            var addDataOrders = new AddDataOrders();
+            addDataOrders.DataAdded += AddDataForm_DataAdded;
+            addDataOrders.ShowDialog();
+        }
+        private void AddDataForm_DataAdded(object sender, EventArgs e)
+        {
+            // Обновление данных в DataGridView
+            RefreshDataGridView();
+        }
+
+
+        private void AddOrdersDB_Click(object sender, EventArgs e)
+        {
+            OpenAddDataOrders();
+            Setsdb.Sort(Setsdb.Columns["orderid"], ListSortDirection.Ascending);
         }
     }
 }

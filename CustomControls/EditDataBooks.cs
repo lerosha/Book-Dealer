@@ -57,5 +57,6 @@ namespace BookDealer.CustomControls
             DialogResult = DialogResult.OK;
             Close();
         }
+
     }
 }

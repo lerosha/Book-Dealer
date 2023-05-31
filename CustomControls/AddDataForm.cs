@@ -53,7 +53,7 @@ namespace BookDealer.CustomControls
         {
             try
             {
-                
+
                 string bookName = bookNameTextBox.Text;
                 int bookPrice = int.Parse(bookPriceTextBox.Text);
                 string bookAuthor = bookAuthorTextBox.Text;

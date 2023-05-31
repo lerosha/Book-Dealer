@@ -34,7 +34,7 @@
             Setsdb = new DataGridView();
             tableLayoutPanel2 = new TableLayoutPanel();
             SaveOrdersDB = new Button();
-            UpdateOrdersDB = new Button();
+            AddOrdersDB = new Button();
             tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)Setsdb).BeginInit();
             tableLayoutPanel2.SuspendLayout();
@@ -87,13 +87,12 @@
             Setsdb.Dock = DockStyle.Fill;
             Setsdb.Location = new Point(3, 92);
             Setsdb.Name = "Setsdb";
+            Setsdb.ReadOnly = true;
             Setsdb.RowHeadersWidth = 51;
             Setsdb.RowTemplate.Height = 29;
             Setsdb.Size = new Size(917, 304);
             Setsdb.TabIndex = 2;
             Setsdb.CellContentClick += Setsdb_CellContentClick;
-            Setsdb.CellValueChanged += Setsdb_CellValueChanged;
-            Setsdb.UserAddedRow += Setsdb_UserAddedRow;
             // 
             // tableLayoutPanel2
             // 
@@ -101,7 +100,7 @@
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 82.47F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 17.53F));
             tableLayoutPanel2.Controls.Add(SaveOrdersDB, 1, 0);
-            tableLayoutPanel2.Controls.Add(UpdateOrdersDB, 0, 0);
+            tableLayoutPanel2.Controls.Add(AddOrdersDB, 0, 0);
             tableLayoutPanel2.Dock = DockStyle.Fill;
             tableLayoutPanel2.Location = new Point(3, 50);
             tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -122,16 +121,16 @@
             SaveOrdersDB.UseVisualStyleBackColor = true;
             SaveOrdersDB.Click += SaveOrdersDB_Click;
             // 
-            // UpdateOrdersDB
+            // AddOrdersDB
             // 
-            UpdateOrdersDB.Dock = DockStyle.Right;
-            UpdateOrdersDB.Location = new Point(605, 3);
-            UpdateOrdersDB.Name = "UpdateOrdersDB";
-            UpdateOrdersDB.Size = new Size(148, 30);
-            UpdateOrdersDB.TabIndex = 1;
-            UpdateOrdersDB.Text = "Обновить таблицу";
-            UpdateOrdersDB.UseVisualStyleBackColor = true;
-            UpdateOrdersDB.Click += UpdateOrdersDB_Click;
+            AddOrdersDB.Dock = DockStyle.Right;
+            AddOrdersDB.Location = new Point(605, 3);
+            AddOrdersDB.Name = "AddOrdersDB";
+            AddOrdersDB.Size = new Size(148, 30);
+            AddOrdersDB.TabIndex = 1;
+            AddOrdersDB.Text = "Добавить";
+            AddOrdersDB.UseVisualStyleBackColor = true;
+            AddOrdersDB.Click += AddOrdersDB_Click;
             // 
             // Orders
             // 
@@ -156,6 +155,6 @@
         private DataGridView Setsdb;
         private TableLayoutPanel tableLayoutPanel2;
         private Button SaveOrdersDB;
-        private Button UpdateOrdersDB;
+        private Button AddOrdersDB;
     }
 }

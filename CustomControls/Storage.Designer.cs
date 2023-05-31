@@ -34,7 +34,7 @@
             Storagedb = new DataGridView();
             tableLayoutPanel2 = new TableLayoutPanel();
             SaveStorageDB = new Button();
-            UpdateStorageDB = new Button();
+            AddStorageDB = new Button();
             tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)Storagedb).BeginInit();
             tableLayoutPanel2.SuspendLayout();
@@ -87,13 +87,12 @@
             Storagedb.Dock = DockStyle.Fill;
             Storagedb.Location = new Point(3, 92);
             Storagedb.Name = "Storagedb";
+            Storagedb.ReadOnly = true;
             Storagedb.RowHeadersWidth = 51;
             Storagedb.RowTemplate.Height = 29;
             Storagedb.Size = new Size(917, 304);
             Storagedb.TabIndex = 2;
             Storagedb.CellContentClick += Storagedb_CellContentClick;
-            Storagedb.CellValueChanged += Storagedb_CellValueChanged;
-            Storagedb.UserAddedRow += Storagedb_UserAddedRow;
             // 
             // tableLayoutPanel2
             // 
@@ -101,7 +100,7 @@
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 82.47F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 17.53F));
             tableLayoutPanel2.Controls.Add(SaveStorageDB, 1, 0);
-            tableLayoutPanel2.Controls.Add(UpdateStorageDB, 0, 0);
+            tableLayoutPanel2.Controls.Add(AddStorageDB, 0, 0);
             tableLayoutPanel2.Dock = DockStyle.Fill;
             tableLayoutPanel2.Location = new Point(3, 50);
             tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -122,16 +121,16 @@
             SaveStorageDB.UseVisualStyleBackColor = true;
             SaveStorageDB.Click += SaveStorageDB_Click;
             // 
-            // UpdateStorageDB
+            // AddStorageDB
             // 
-            UpdateStorageDB.Dock = DockStyle.Right;
-            UpdateStorageDB.Location = new Point(605, 3);
-            UpdateStorageDB.Name = "UpdateStorageDB";
-            UpdateStorageDB.Size = new Size(148, 30);
-            UpdateStorageDB.TabIndex = 1;
-            UpdateStorageDB.Text = "Обновить таблицу";
-            UpdateStorageDB.UseVisualStyleBackColor = true;
-            UpdateStorageDB.Click += UpdateStorageDB_Click;
+            AddStorageDB.Dock = DockStyle.Right;
+            AddStorageDB.Location = new Point(605, 3);
+            AddStorageDB.Name = "AddStorageDB";
+            AddStorageDB.Size = new Size(148, 30);
+            AddStorageDB.TabIndex = 1;
+            AddStorageDB.Text = "Добавить";
+            AddStorageDB.UseVisualStyleBackColor = true;
+            AddStorageDB.Click += AddStorageDB_Click;
             // 
             // Storage
             // 
@@ -156,6 +155,6 @@
         private DataGridView Storagedb;
         private TableLayoutPanel tableLayoutPanel2;
         private Button SaveStorageDB;
-        private Button UpdateStorageDB;
+        private Button AddStorageDB;
     }
 }

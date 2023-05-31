@@ -1,0 +1,112 @@
+private void OpenCustomControl(int orderId)
+        {
+            try
+            {
+                string query = "SELECT o.orderid, o.date, o.count, o.sum, s.information AS salescontract, b.name AS book, " +
+                    "'Редактировать' AS Edit " +
+               "FROM orders AS o " +
+               "JOIN salescontracts AS s ON o.contractid = s.contractid " +
+               "JOIN books AS b ON o.bookid = b.bookid " +
+               "WHERE o.orderid = @orderid";
+                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                command.Parameters.AddWithValue("@orderid", orderId);
+
+                NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(command);
+                DataSet dataSet = new DataSet();
+                adapter.Fill(dataSet, "orders");
+
+                if (dataSet.Tables["orders"].Rows.Count > 0)
+                {
+                    // Создать и открыть форму EditDataBooks
+                    var editDataOrders = new EditDataOrders();
+                    editDataOrders.OrderName = orderId;
+                    string dateString = dataSet.Tables["orders"].Rows[0]["date"].ToString();
+                    LocalDatePattern databasePattern = LocalDatePattern.CreateWithInvariantCulture("yyyy-MM-dd");
+                    ParseResult<LocalDate> parseResult = databasePattern.Parse(dateString);
+
+                    if (parseResult.Success)
+                    {
+                        LocalDate parsedDate = parseResult.Value;
+
+                        // Конвертировать дату в формат DataGridView
+                        string dataGridViewFormat = "dd.MM.yyyy";
+                        string formattedDate = LocalDatePattern.CreateWithInvariantCulture(dataGridViewFormat).Format(parsedDate);
+
+                        // Установить отформатированную дату в элемент управления
+                        editDataOrders.Date = LocalDatePattern.Iso.Parse(formattedDate).Value;
+                    }
+                    else
+                    {
+                        // Некорректный формат даты
+                        // Установить значение по умолчанию (например, сегодняшняя дата)
+                        editDataOrders.Date = LocalDate.FromDateTime(DateTime.Today);
+                        MessageBox.Show("Некорректный формат датыыыыы.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    editDataOrders.Count = decimal.Parse(dataSet.Tables["orders"].Rows[0]["count"].ToString());
+                    editDataOrders.Sum = decimal.Parse(dataSet.Tables["orders"].Rows[0]["sum"].ToString());
+                    editDataOrders.Contract = dataSet.Tables["orders"].Rows[0]["salescontract"].ToString();
+                    editDataOrders.BookName = dataSet.Tables["orders"].Rows[0]["book"].ToString();
+                    // Продолжите добавлять остальные параметры книги в форму EditDataBooks
+
+                    DialogResult result = editDataOrders.ShowDialog();
+
+                    if (result == DialogResult.OK)
+                    {
+                        // Получить обновленные параметры книги из формы EditDataBooks
+                        LocalDate updatedDate = editDataOrders.Date;
+                        decimal updatedCount = editDataOrders.Count;
+                        decimal updatedSum = editDataOrders.Sum;
+
+                        // Обновить базу данных с новыми значениями
+                        string updateQuery = "UPDATE orders SET date = @date, count = @count, sum = @sum WHERE orderid = @orderid";
+                        NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
+                        string databaseDateFormat = "yyyy-MM-dd";
+                        string formattedDate = LocalDatePattern.CreateWithInvariantCulture(databaseDateFormat).Format(updatedDate);
+                        updateCommand.Parameters.AddWithValue("@date", formattedDate);
+                        updateCommand.Parameters.AddWithValue("@count", updatedCount);
+                        updateCommand.Parameters.AddWithValue("@sum", updatedSum);
+                        updateCommand.Parameters.AddWithValue("@orderid", orderId);
+                        updateCommand.ExecuteNonQuery();
+
+                        DataRow updatedRow = dataSet.Tables["orders"].Rows[0];
+                        updatedRow["date"] = updatedDate;
+                        updatedRow["count"] = updatedCount;
+                        updatedRow["sum"] = updatedSum;
+
+                        int rowIndex = Setsdb.SelectedCells[0].RowIndex;
+                        DataGridViewRow dataGridViewRow = Setsdb.Rows[rowIndex];
+                        dataGridViewRow.Cells["date"].Value = updatedDate;
+                        dataGridViewRow.Cells["count"].Value = updatedCount;
+                        dataGridViewRow.Cells["sum"].Value = updatedSum;
+                        // Обновите остальные ячейки в соответствии с обновлениями
+
+                        // Очистите выделение в DataGridView
+                        Setsdb.ClearSelection();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Книга с указанным названием не найдена.", "Ошибка OpenCustomControl!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка OpenCustomControl!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void Setsdb_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                if (e.RowIndex >= 0 && e.ColumnIndex == Setsdb.Columns["Edit"].Index)
+                {
+                    int orderId = (int)Setsdb.Rows[e.RowIndex].Cells["orderid"].Value;
+                    OpenCustomControl(orderId);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка CellContentClick!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }

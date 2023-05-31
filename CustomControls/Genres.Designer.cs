@@ -32,7 +32,6 @@
             label1 = new Label();
             FromGenresButton = new Button();
             dataGridView1 = new DataGridView();
-            button2 = new Button();
             tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
@@ -42,17 +41,16 @@
             tableLayoutPanel1.ColumnCount = 1;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.Controls.Add(label1, 0, 0);
-            tableLayoutPanel1.Controls.Add(FromGenresButton, 0, 3);
-            tableLayoutPanel1.Controls.Add(dataGridView1, 0, 2);
-            tableLayoutPanel1.Controls.Add(button2, 0, 1);
+            tableLayoutPanel1.Controls.Add(FromGenresButton, 0, 2);
+            tableLayoutPanel1.Controls.Add(dataGridView1, 0, 1);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.RowCount = 4;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 10.8459091F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 9.66628F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 72.08897F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 7.39884567F));
+            tableLayoutPanel1.RowCount = 3;
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 12.0064907F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 79.80293F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 8.190569F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tableLayoutPanel1.Size = new Size(961, 567);
             tableLayoutPanel1.TabIndex = 0;
             // 
@@ -61,7 +59,7 @@
             label1.Anchor = AnchorStyles.None;
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.Location = new Point(410, 15);
+            label1.Location = new Point(410, 18);
             label1.Name = "label1";
             label1.Size = new Size(141, 31);
             label1.TabIndex = 0;
@@ -70,9 +68,9 @@
             // FromGenresButton
             // 
             FromGenresButton.Dock = DockStyle.Fill;
-            FromGenresButton.Location = new Point(3, 526);
+            FromGenresButton.Location = new Point(3, 523);
             FromGenresButton.Name = "FromGenresButton";
-            FromGenresButton.Size = new Size(955, 38);
+            FromGenresButton.Size = new Size(955, 41);
             FromGenresButton.TabIndex = 3;
             FromGenresButton.Text = "Назад";
             FromGenresButton.UseVisualStyleBackColor = true;
@@ -82,26 +80,12 @@
             // 
             dataGridView1.Anchor = AnchorStyles.None;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Location = new Point(331, 120);
+            dataGridView1.Location = new Point(331, 95);
             dataGridView1.Name = "dataGridView1";
             dataGridView1.RowHeadersWidth = 51;
             dataGridView1.RowTemplate.Height = 29;
             dataGridView1.Size = new Size(298, 397);
             dataGridView1.TabIndex = 2;
-            dataGridView1.CellContentClick += dataGridView1_CellContentClick;
-            dataGridView1.CellValueChanged += dataGridView1_CellValueChanged;
-            dataGridView1.UserAddedRow += dataGridView1_UserAddedRow;
-            // 
-            // button2
-            // 
-            button2.Anchor = AnchorStyles.None;
-            button2.Location = new Point(331, 67);
-            button2.Name = "button2";
-            button2.Size = new Size(298, 41);
-            button2.TabIndex = 4;
-            button2.Text = "Обновить таблицу";
-            button2.UseVisualStyleBackColor = true;
-            button2.Click += button2_Click;
             // 
             // Genres
             // 
@@ -123,6 +107,5 @@
         private Label label1;
         private DataGridView dataGridView1;
         private Button FromGenresButton;
-        private Button button2;
     }
 }
