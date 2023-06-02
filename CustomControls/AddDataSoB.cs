@@ -1,11 +1,11 @@
-﻿using NodaTime;
-using Npgsql;
+﻿using Npgsql;
 using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics.Metrics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -14,27 +14,27 @@ using System.Windows.Forms;
 
 namespace BookDealer.CustomControls
 {
-    public partial class AddDataOrders : Form
+    public partial class AddDataSoB : Form
     {
         private NpgsqlConnection? connection = null;
         public event EventHandler DataAdded;
-        public AddDataOrders()
+
+        public AddDataSoB()
         {
             InitializeComponent();
         }
 
         public event EventHandler DataSaved;
-        private bool isEnough;
 
-        private int GetPublisherIdByName(string salesConName)
+        private int GetSupConIdByName(string supConName)
         {
-            string query = "SELECT contractid FROM salescontracts WHERE information = @information";
+            string query = "SELECT contractid FROM supplycontracts WHERE information = @information";
             NpgsqlCommand command = new NpgsqlCommand(query, connection);
-            command.Parameters.AddWithValue("@information", salesConName);
-            int salesConId = Convert.ToInt32(command.ExecuteScalar());
-            return salesConId;
+            command.Parameters.AddWithValue("@information", supConName);
+            int supConId = Convert.ToInt32(command.ExecuteScalar());
+            return supConId;
         }
-        private int GetGenreIdByName(string bookName)
+        private int GetBookIdByName(string bookName)
         {
             string query = "SELECT bookid FROM books WHERE name = @name";
             NpgsqlCommand command = new NpgsqlCommand(query, connection);
@@ -43,7 +43,7 @@ namespace BookDealer.CustomControls
             return bookId;
         }
 
-        private void SubtractFromStoreroom(int subtractCount, int bookid)
+        private void AddToStorage(int addCount, int bookId)
         {
             try
             {
@@ -53,26 +53,17 @@ namespace BookDealer.CustomControls
                 decimal currentCount = (int)selectCommand.ExecuteScalar();
 
                 // Проверить, есть ли достаточное количество для вычитания
-                if (currentCount >= subtractCount)
-                {
-                    string updateQuery = "UPDATE storeroom SET count = count - @subtractCount WHERE  bookid = @bookid";
-                    NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
-                    updateCommand.Parameters.AddWithValue("@subtractCount", subtractCount);
-                    updateCommand.Parameters.AddWithValue("@bookid", bookid);
-                    updateCommand.ExecuteNonQuery();
-                    isEnough = true;
 
-                }
-                else
-                {
-                    isEnough = false;
-
-                }
+                string updateQuery = "UPDATE storeroom SET count = count + @addCount WHERE  bookid = @bookid";
+                NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
+                updateCommand.Parameters.AddWithValue("@addCount", addCount);
+                updateCommand.Parameters.AddWithValue("@bookid", bookId);
+                updateCommand.ExecuteNonQuery();
 
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Ошибка вычитания из базы данных", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "Ошибка добавления в базы данных", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -80,42 +71,40 @@ namespace BookDealer.CustomControls
         {
             try
             {
-                DateTime dateTime = dateTimePicker1.Value;
-                LocalDateTime localTime = LocalDateTime.FromDateTime(dateTime);
+                int count = int.Parse(countTextBox.Text);
+                string supConName = SupConComboBox.SelectedItem.ToString();
                 string bookName = BookComboBox.SelectedItem.ToString();
-                string salesConName = SalesConComboBox.SelectedItem.ToString();
-                decimal orderSum = decimal.Parse(SumTextBox.Text);
-                decimal orderCount = decimal.Parse(CountTextBox.Text);
 
                 // Получить идентификаторы связанных записей на основе выбранных значений
-                int salesConId = GetPublisherIdByName(salesConName);
-                int bookId = GetGenreIdByName(bookName);
+                int suoConId = GetSupConIdByName(supConName);
+                int bookId = GetBookIdByName(bookName);
 
-                int subtractCount = int.Parse(CountTextBox.Text);
-                SubtractFromStoreroom(subtractCount, bookId);
+                // Get the price from the instruments table
+                string priceQuery = "SELECT price FROM books WHERE bookid = @bookid";
+                NpgsqlCommand priceCommand = new NpgsqlCommand(priceQuery, connection);
+                priceCommand.Parameters.AddWithValue("@bookidbookid", bookId);
+                decimal price = Convert.ToDecimal(priceCommand.ExecuteScalar());
 
-                if (isEnough == true)
-                {
-                    // Вставить новую запись в таблицу
-                    string insertQuery = "INSERT INTO orders (date, count, sum, contractid, bookid) VALUES (@date, @count, @sum, @contractid, @bookid)";
-                    NpgsqlCommand insertCommand = new NpgsqlCommand(insertQuery, connection);
-                    insertCommand.Parameters.AddWithValue("@date", localTime.ToDateTimeUnspecified());
-                    insertCommand.Parameters.AddWithValue("@count", orderCount);
-                    insertCommand.Parameters.AddWithValue("@sum", orderSum);
-                    insertCommand.Parameters.AddWithValue("@contractid", salesConId);
-                    insertCommand.Parameters.AddWithValue("@bookid", bookId);
-                    insertCommand.ExecuteNonQuery();
-                    MessageBox.Show("Заказ успешно оформлен!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else if (isEnough == false)
-                {
-                    MessageBox.Show("Недостаточное количество книг на складе!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                decimal total = count * price;
+
+                int addCount = int.Parse(countTextBox.Text);
+                AddToStorage(addCount, bookId);
+
+                // Вставить новую запись в таблицу
+                string insertQuery = "INSERT INTO setsofbooks (count, sum, contractid, bookid) VALUES (@count, @sum, @contractid, @bookid)";
+                NpgsqlCommand insertCommand = new NpgsqlCommand(insertQuery, connection);
+                insertCommand.Parameters.AddWithValue("@count", count);
+                insertCommand.Parameters.AddWithValue("@sum", total);
+                insertCommand.Parameters.AddWithValue("@contractid", suoConId);
+                insertCommand.Parameters.AddWithValue("@bookid", bookId);
+                insertCommand.ExecuteNonQuery();
+
                 // Обновить отображение в DataGridView
                 DataAdded?.Invoke(this, EventArgs.Empty);
                 Close();
                 // Предполагается, что у вас есть DataGridView с именем BooksDataGridView
 
+                MessageBox.Show("Данные успешно добавлены!", "Добавление данных", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -123,30 +112,10 @@ namespace BookDealer.CustomControls
             }
         }
 
-        private void AddDataOrders_Load(object sender, EventArgs e)
+        private void AddDataSoB_Load(object sender, EventArgs e)
         {
             connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["BookDealer"].ConnectionString);
             connection.Open();
-
-            try
-            {
-                // Заполнение ComboBox из таблицы "publishers"
-                string query = "SELECT information FROM salescontracts";
-                NpgsqlCommand command = new NpgsqlCommand(query, connection);
-                NpgsqlDataReader reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    string salesConName = reader["information"].ToString();
-                    SalesConComboBox.Items.Add(salesConName);
-                }
-                reader.Close();
-
-                // Аналогично заполните ComboBox для других связанных таблиц
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Ошибка загрузки данных", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
 
             try
             {
@@ -168,6 +137,25 @@ namespace BookDealer.CustomControls
                 MessageBox.Show(ex.Message, "Ошибка загрузки данных", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
+            try
+            {
+                // Заполнение ComboBox из таблицы "publishers"
+                string query = "SELECT information FROM supplycontracts";
+                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                NpgsqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    string supConName = reader["information"].ToString();
+                    SupConComboBox.Items.Add(supConName);
+                }
+                reader.Close();
+
+                // Аналогично заполните ComboBox для других связанных таблиц
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка загрузки данных", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

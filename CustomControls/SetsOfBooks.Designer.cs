@@ -34,7 +34,7 @@
             Setsdb = new DataGridView();
             tableLayoutPanel2 = new TableLayoutPanel();
             SaveSetsDB = new Button();
-            UpdateSetsDB = new Button();
+            AddSetsDB = new Button();
             tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)Setsdb).BeginInit();
             tableLayoutPanel2.SuspendLayout();
@@ -87,13 +87,12 @@
             Setsdb.Dock = DockStyle.Fill;
             Setsdb.Location = new Point(3, 92);
             Setsdb.Name = "Setsdb";
+            Setsdb.ReadOnly = true;
             Setsdb.RowHeadersWidth = 51;
             Setsdb.RowTemplate.Height = 29;
             Setsdb.Size = new Size(917, 304);
             Setsdb.TabIndex = 2;
             Setsdb.CellContentClick += Setsdb_CellContentClick;
-            Setsdb.CellValueChanged += Setsdb_CellValueChanged;
-            Setsdb.UserAddedRow += Setsdb_UserAddedRow;
             // 
             // tableLayoutPanel2
             // 
@@ -101,7 +100,7 @@
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 82.47F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 17.53F));
             tableLayoutPanel2.Controls.Add(SaveSetsDB, 1, 0);
-            tableLayoutPanel2.Controls.Add(UpdateSetsDB, 0, 0);
+            tableLayoutPanel2.Controls.Add(AddSetsDB, 0, 0);
             tableLayoutPanel2.Dock = DockStyle.Fill;
             tableLayoutPanel2.Location = new Point(3, 50);
             tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -122,16 +121,16 @@
             SaveSetsDB.UseVisualStyleBackColor = true;
             SaveSetsDB.Click += SaveSetsDB_Click;
             // 
-            // UpdateSetsDB
+            // AddSetsDB
             // 
-            UpdateSetsDB.Dock = DockStyle.Right;
-            UpdateSetsDB.Location = new Point(605, 3);
-            UpdateSetsDB.Name = "UpdateSetsDB";
-            UpdateSetsDB.Size = new Size(148, 30);
-            UpdateSetsDB.TabIndex = 1;
-            UpdateSetsDB.Text = "Обновить таблицу";
-            UpdateSetsDB.UseVisualStyleBackColor = true;
-            UpdateSetsDB.Click += UpdateSetsDB_Click;
+            AddSetsDB.Dock = DockStyle.Right;
+            AddSetsDB.Location = new Point(605, 3);
+            AddSetsDB.Name = "AddSetsDB";
+            AddSetsDB.Size = new Size(148, 30);
+            AddSetsDB.TabIndex = 1;
+            AddSetsDB.Text = "Добавить";
+            AddSetsDB.UseVisualStyleBackColor = true;
+            AddSetsDB.Click += AddSetsDB_Click;
             // 
             // SetsOfBooks
             // 
@@ -156,6 +155,6 @@
         private DataGridView Setsdb;
         private TableLayoutPanel tableLayoutPanel2;
         private Button SaveSetsDB;
-        private Button UpdateSetsDB;
+        private Button AddSetsDB;
     }
 }

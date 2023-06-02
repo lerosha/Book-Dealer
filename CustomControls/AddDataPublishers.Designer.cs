@@ -1,6 +1,6 @@
 ﻿namespace BookDealer.CustomControls
 {
-    partial class AddDataOrders
+    partial class AddDataPublishers
     {
         /// <summary>
         /// Required designer variable.
@@ -29,82 +29,70 @@
         private void InitializeComponent()
         {
             label7 = new Label();
-            label5 = new Label();
             label4 = new Label();
             label3 = new Label();
             label2 = new Label();
             label1 = new Label();
             SaveButton = new Button();
-            BookComboBox = new ComboBox();
-            SalesConComboBox = new ComboBox();
-            SumTextBox = new TextBox();
-            CountTextBox = new TextBox();
-            dateTimePicker1 = new DateTimePicker();
+            pubDirTextBox = new TextBox();
+            pubAddrTextBox = new TextBox();
+            pubNameTextBox = new TextBox();
+            pubBankTextBox = new TextBox();
             SuspendLayout();
             // 
             // label7
             // 
             label7.AutoSize = true;
             label7.Font = new Font("Segoe UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point);
-            label7.Location = new Point(246, 28);
+            label7.Location = new Point(224, 24);
             label7.Name = "label7";
-            label7.Size = new Size(303, 31);
+            label7.Size = new Size(285, 31);
             label7.TabIndex = 27;
-            label7.Text = "Добавление заказа клиента";
-            // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            label5.Location = new Point(364, 95);
-            label5.Name = "label5";
-            label5.Size = new Size(207, 28);
-            label5.TabIndex = 25;
-            label5.Text = "Договор на продажу";
+            label7.Text = "Добавление издательства";
             // 
             // label4
             // 
             label4.AutoSize = true;
             label4.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            label4.Location = new Point(396, 158);
+            label4.Location = new Point(129, 267);
             label4.Name = "label4";
-            label4.Size = new Size(70, 28);
+            label4.Size = new Size(168, 28);
             label4.TabIndex = 24;
-            label4.Text = "Книга:";
+            label4.Text = "Банковский счет:";
             // 
             // label3
             // 
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            label3.Location = new Point(12, 223);
+            label3.Location = new Point(129, 200);
             label3.Name = "label3";
-            label3.Size = new Size(76, 28);
+            label3.Size = new Size(163, 28);
             label3.TabIndex = 23;
-            label3.Text = "Сумма:";
+            label3.Text = "ФИО директора:";
             // 
             // label2
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            label2.Location = new Point(12, 158);
+            label2.Location = new Point(129, 138);
             label2.Name = "label2";
-            label2.Size = new Size(120, 28);
+            label2.Size = new Size(71, 28);
             label2.TabIndex = 22;
-            label2.Text = "Количество";
+            label2.Text = "Адрес:";
             // 
             // label1
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.Location = new Point(12, 95);
+            label1.Location = new Point(129, 74);
             label1.Name = "label1";
-            label1.Size = new Size(121, 28);
+            label1.Size = new Size(239, 28);
             label1.TabIndex = 21;
-            label1.Text = "Дата заказа:";
+            label1.Text = "Навзвание издательства:";
             // 
             // SaveButton
             // 
-            SaveButton.Location = new Point(343, 303);
+            SaveButton.Location = new Point(295, 326);
             SaveButton.Name = "SaveButton";
             SaveButton.Size = new Size(180, 33);
             SaveButton.TabIndex = 20;
@@ -112,63 +100,52 @@
             SaveButton.UseVisualStyleBackColor = true;
             SaveButton.Click += SaveButton_Click;
             // 
-            // BookComboBox
+            // pubDirTextBox
             // 
-            BookComboBox.FormattingEnabled = true;
-            BookComboBox.Location = new Point(577, 162);
-            BookComboBox.Name = "BookComboBox";
-            BookComboBox.Size = new Size(193, 28);
-            BookComboBox.TabIndex = 18;
+            pubDirTextBox.Location = new Point(383, 204);
+            pubDirTextBox.Name = "pubDirTextBox";
+            pubDirTextBox.Size = new Size(257, 27);
+            pubDirTextBox.TabIndex = 16;
             // 
-            // SalesConComboBox
+            // pubAddrTextBox
             // 
-            SalesConComboBox.FormattingEnabled = true;
-            SalesConComboBox.Location = new Point(577, 95);
-            SalesConComboBox.Name = "SalesConComboBox";
-            SalesConComboBox.Size = new Size(193, 28);
-            SalesConComboBox.TabIndex = 17;
+            pubAddrTextBox.Location = new Point(383, 142);
+            pubAddrTextBox.Name = "pubAddrTextBox";
+            pubAddrTextBox.Size = new Size(257, 27);
+            pubAddrTextBox.TabIndex = 15;
             // 
-            // SumTextBox
+            // pubNameTextBox
             // 
-            SumTextBox.Location = new Point(156, 224);
-            SumTextBox.Name = "SumTextBox";
-            SumTextBox.Size = new Size(193, 27);
-            SumTextBox.TabIndex = 16;
+            pubNameTextBox.Location = new Point(383, 78);
+            pubNameTextBox.Name = "pubNameTextBox";
+            pubNameTextBox.Size = new Size(257, 27);
+            pubNameTextBox.TabIndex = 14;
             // 
-            // CountTextBox
+            // pubBankTextBox
             // 
-            CountTextBox.Location = new Point(156, 163);
-            CountTextBox.Name = "CountTextBox";
-            CountTextBox.Size = new Size(193, 27);
-            CountTextBox.TabIndex = 15;
+            pubBankTextBox.Location = new Point(383, 268);
+            pubBankTextBox.Name = "pubBankTextBox";
+            pubBankTextBox.Size = new Size(257, 27);
+            pubBankTextBox.TabIndex = 28;
             // 
-            // dateTimePicker1
-            // 
-            dateTimePicker1.Location = new Point(156, 96);
-            dateTimePicker1.Name = "dateTimePicker1";
-            dateTimePicker1.Size = new Size(193, 27);
-            dateTimePicker1.TabIndex = 28;
-            // 
-            // AddDataOrders
+            // AddDataPublishers
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 371);
-            Controls.Add(dateTimePicker1);
+            ClientSize = new Size(772, 371);
+            Controls.Add(pubBankTextBox);
             Controls.Add(label7);
-            Controls.Add(label5);
             Controls.Add(label4);
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(label1);
             Controls.Add(SaveButton);
-            Controls.Add(BookComboBox);
-            Controls.Add(SalesConComboBox);
-            Controls.Add(SumTextBox);
-            Controls.Add(CountTextBox);
-            Name = "AddDataOrders";
-            Text = "AddDataOrders";
-            Load += AddDataOrders_Load;
+            Controls.Add(pubDirTextBox);
+            Controls.Add(pubAddrTextBox);
+            Controls.Add(pubNameTextBox);
+            Name = "AddDataPublishers";
+            Text = "AddDataPublishers";
+            Load += AddDataPublishers_Load;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -176,16 +153,14 @@
         #endregion
 
         private Label label7;
-        private Label label5;
         private Label label4;
         private Label label3;
         private Label label2;
         private Label label1;
         private Button SaveButton;
-        private ComboBox BookComboBox;
-        private ComboBox SalesConComboBox;
-        private TextBox SumTextBox;
-        private TextBox CountTextBox;
-        private DateTimePicker dateTimePicker1;
+        private TextBox pubDirTextBox;
+        private TextBox pubAddrTextBox;
+        private TextBox pubNameTextBox;
+        private TextBox pubBankTextBox;
     }
 }

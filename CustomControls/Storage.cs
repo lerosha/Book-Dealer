@@ -27,6 +27,7 @@ namespace BookDealer.CustomControls
         public Storage()
         {
             InitializeComponent();
+            this.VisibleChanged += Storage_VisibleChanged;
         }
 
         private void FromStorageButton_Click(object sender, EventArgs e)
@@ -98,7 +99,7 @@ namespace BookDealer.CustomControls
                     if (result == DialogResult.OK)
                     {
                         decimal updatedCount = editDataStorage.CountBook;
-                       
+
                         // Обновить базу данных с новыми значениями
                         string updateQuery = "UPDATE storeroom SET count = @count WHERE collectbooksid = @collectbooksid";
                         NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
@@ -230,6 +231,14 @@ namespace BookDealer.CustomControls
         private void SaveStorageDB_Click(object sender, EventArgs e)
         {
             GenerateWordDocument(Storagedb);
+        }
+
+        private void Storage_VisibleChanged(object sender, EventArgs e)
+        {
+            if (this.Visible)
+            {
+                RefreshDataGridView();
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace BookDealer.CustomControls
 {
-    partial class EditDataClients
+    partial class EditDataPublishers
     {
         /// <summary>
         /// Required designer variable.
@@ -28,150 +28,130 @@
         /// </summary>
         private void InitializeComponent()
         {
-            label5 = new Label();
+            label6 = new Label();
             label4 = new Label();
             label3 = new Label();
             label2 = new Label();
             label1 = new Label();
-            addressTextBox = new TextBox();
-            bankTextBox = new TextBox();
             btnOK = new Button();
-            midTextBox = new TextBox();
-            SurTextBox = new TextBox();
+            AddressTextBox = new TextBox();
             NameTextBox = new TextBox();
-            label6 = new Label();
+            DirBox = new TextBox();
+            MoneyBox = new TextBox();
             SuspendLayout();
             // 
-            // label5
+            // label6
             // 
-            label5.AutoSize = true;
-            label5.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            label5.Location = new Point(181, 293);
-            label5.Name = "label5";
-            label5.Size = new Size(71, 28);
-            label5.TabIndex = 24;
-            label5.Text = "Адрес:";
+            label6.AutoSize = true;
+            label6.Font = new Font("Segoe UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point);
+            label6.Location = new Point(165, 25);
+            label6.Name = "label6";
+            label6.Size = new Size(458, 31);
+            label6.TabIndex = 37;
+            label6.Text = "Редактиование информации издательства";
             // 
             // label4
             // 
             label4.AutoSize = true;
             label4.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            label4.Location = new Point(181, 241);
+            label4.Location = new Point(174, 222);
             label4.Name = "label4";
             label4.Size = new Size(168, 28);
-            label4.TabIndex = 23;
+            label4.TabIndex = 35;
             label4.Text = "Банковский счет:";
             // 
             // label3
             // 
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            label3.Location = new Point(181, 193);
+            label3.Location = new Point(174, 174);
             label3.Name = "label3";
-            label3.Size = new Size(100, 28);
-            label3.TabIndex = 22;
-            label3.Text = "Отчество:";
+            label3.Size = new Size(106, 28);
+            label3.TabIndex = 34;
+            label3.Text = "Директор:";
             // 
             // label2
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            label2.Location = new Point(181, 145);
+            label2.Location = new Point(174, 126);
             label2.Name = "label2";
-            label2.Size = new Size(100, 28);
-            label2.TabIndex = 21;
-            label2.Text = "Фамилия:";
+            label2.Size = new Size(71, 28);
+            label2.TabIndex = 33;
+            label2.Text = "Адрес:";
             // 
             // label1
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.Location = new Point(181, 96);
+            label1.Location = new Point(174, 77);
             label1.Name = "label1";
-            label1.Size = new Size(55, 28);
-            label1.TabIndex = 20;
-            label1.Text = "Имя:";
-            // 
-            // addressTextBox
-            // 
-            addressTextBox.Location = new Point(372, 293);
-            addressTextBox.Name = "addressTextBox";
-            addressTextBox.Size = new Size(240, 27);
-            addressTextBox.TabIndex = 18;
-            // 
-            // bankTextBox
-            // 
-            bankTextBox.Location = new Point(372, 241);
-            bankTextBox.Name = "bankTextBox";
-            bankTextBox.Size = new Size(240, 27);
-            bankTextBox.TabIndex = 17;
+            label1.Size = new Size(104, 28);
+            label1.TabIndex = 32;
+            label1.Text = "Название:";
             // 
             // btnOK
             // 
-            btnOK.Location = new Point(294, 361);
+            btnOK.Location = new Point(298, 290);
             btnOK.Name = "btnOK";
             btnOK.Size = new Size(142, 38);
-            btnOK.TabIndex = 16;
+            btnOK.TabIndex = 29;
             btnOK.Text = "Сохранить";
             btnOK.UseVisualStyleBackColor = true;
             btnOK.Click += btnOK_Click;
             // 
-            // midTextBox
+            // AddressTextBox
             // 
-            midTextBox.Location = new Point(372, 193);
-            midTextBox.Name = "midTextBox";
-            midTextBox.Size = new Size(240, 27);
-            midTextBox.TabIndex = 15;
-            // 
-            // SurTextBox
-            // 
-            SurTextBox.Location = new Point(372, 145);
-            SurTextBox.Name = "SurTextBox";
-            SurTextBox.Size = new Size(240, 27);
-            SurTextBox.TabIndex = 14;
+            AddressTextBox.Location = new Point(365, 126);
+            AddressTextBox.Name = "AddressTextBox";
+            AddressTextBox.Size = new Size(240, 27);
+            AddressTextBox.TabIndex = 27;
             // 
             // NameTextBox
             // 
-            NameTextBox.Location = new Point(372, 96);
+            NameTextBox.Location = new Point(365, 77);
             NameTextBox.Name = "NameTextBox";
             NameTextBox.Size = new Size(240, 27);
-            NameTextBox.TabIndex = 13;
+            NameTextBox.TabIndex = 26;
             // 
-            // label6
+            // DirBox
             // 
-            label6.AutoSize = true;
-            label6.Font = new Font("Segoe UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point);
-            label6.Location = new Point(251, 31);
-            label6.Name = "label6";
-            label6.Size = new Size(260, 31);
-            label6.TabIndex = 25;
-            label6.Text = "Редактиование клиента";
+            DirBox.Location = new Point(365, 178);
+            DirBox.Name = "DirBox";
+            DirBox.Size = new Size(240, 27);
+            DirBox.TabIndex = 38;
             // 
-            // EditDataClients
+            // MoneyBox
+            // 
+            MoneyBox.Location = new Point(365, 223);
+            MoneyBox.Name = "MoneyBox";
+            MoneyBox.Size = new Size(240, 27);
+            MoneyBox.TabIndex = 39;
+            // 
+            // EditDataPublishers
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(769, 419);
+            ClientSize = new Size(778, 358);
+            Controls.Add(MoneyBox);
+            Controls.Add(DirBox);
             Controls.Add(label6);
-            Controls.Add(label5);
             Controls.Add(label4);
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(label1);
-            Controls.Add(addressTextBox);
-            Controls.Add(bankTextBox);
             Controls.Add(btnOK);
-            Controls.Add(midTextBox);
-            Controls.Add(SurTextBox);
+            Controls.Add(AddressTextBox);
             Controls.Add(NameTextBox);
-            Name = "EditDataClients";
-            Text = "EditDataClients";
+            Name = "EditDataPublishers";
+            Text = "EditDataPublishers";
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
 
+        private Label label6;
         private Label label5;
         private Label label4;
         private Label label3;
@@ -181,8 +161,9 @@
         public TextBox bankTextBox;
         private Button btnOK;
         public TextBox midTextBox;
-        public TextBox SurTextBox;
+        public TextBox AddressTextBox;
         public TextBox NameTextBox;
-        private Label label6;
+        public TextBox DirBox;
+        public TextBox MoneyBox;
     }
 }

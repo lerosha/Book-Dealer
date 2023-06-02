@@ -140,6 +140,7 @@
             Name = "Storage";
             Size = new Size(923, 438);
             Load += Storage_Load;
+            VisibleChanged += Storage_VisibleChanged;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)Storagedb).EndInit();
