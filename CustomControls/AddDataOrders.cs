@@ -48,14 +48,15 @@ namespace BookDealer.CustomControls
             try
             {
                 // Получить текущее значение из поля count в таблице storeroom
-                string selectQuery = "SELECT count FROM storeroom";
+                string selectQuery = "SELECT count FROM storeroom WHERE bookid = @bookid";
                 NpgsqlCommand selectCommand = new NpgsqlCommand(selectQuery, connection);
+                selectCommand.Parameters.AddWithValue("@bookid", bookid);
                 decimal currentCount = (int)selectCommand.ExecuteScalar();
 
                 // Проверить, есть ли достаточное количество для вычитания
                 if (currentCount >= subtractCount)
                 {
-                    string updateQuery = "UPDATE storeroom SET count = count - @subtractCount WHERE  bookid = @bookid";
+                    string updateQuery = "UPDATE storeroom SET count = count - @subtractCount WHERE bookid = @bookid";
                     NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
                     updateCommand.Parameters.AddWithValue("@subtractCount", subtractCount);
                     updateCommand.Parameters.AddWithValue("@bookid", bookid);

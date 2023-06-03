@@ -34,7 +34,7 @@
             Salesdb = new DataGridView();
             tableLayoutPanel2 = new TableLayoutPanel();
             SaveSelesDB = new Button();
-            UpdateSalesDB = new Button();
+            AddSalesDB = new Button();
             tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)Salesdb).BeginInit();
             tableLayoutPanel2.SuspendLayout();
@@ -87,13 +87,12 @@
             Salesdb.Dock = DockStyle.Fill;
             Salesdb.Location = new Point(3, 92);
             Salesdb.Name = "Salesdb";
+            Salesdb.ReadOnly = true;
             Salesdb.RowHeadersWidth = 51;
             Salesdb.RowTemplate.Height = 29;
             Salesdb.Size = new Size(917, 304);
             Salesdb.TabIndex = 2;
             Salesdb.CellContentClick += Suppludb_CellContentClick;
-            Salesdb.CellValueChanged += Suppludb_CellValueChanged;
-            Salesdb.UserAddedRow += Suppludb_UserAddedRow;
             // 
             // tableLayoutPanel2
             // 
@@ -101,7 +100,7 @@
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 82.47F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 17.53F));
             tableLayoutPanel2.Controls.Add(SaveSelesDB, 1, 0);
-            tableLayoutPanel2.Controls.Add(UpdateSalesDB, 0, 0);
+            tableLayoutPanel2.Controls.Add(AddSalesDB, 0, 0);
             tableLayoutPanel2.Dock = DockStyle.Fill;
             tableLayoutPanel2.Location = new Point(3, 50);
             tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -122,16 +121,16 @@
             SaveSelesDB.UseVisualStyleBackColor = true;
             SaveSelesDB.Click += SaveSelesDB_Click;
             // 
-            // UpdateSalesDB
+            // AddSalesDB
             // 
-            UpdateSalesDB.Dock = DockStyle.Right;
-            UpdateSalesDB.Location = new Point(605, 3);
-            UpdateSalesDB.Name = "UpdateSalesDB";
-            UpdateSalesDB.Size = new Size(148, 30);
-            UpdateSalesDB.TabIndex = 1;
-            UpdateSalesDB.Text = "Обновить таблицу";
-            UpdateSalesDB.UseVisualStyleBackColor = true;
-            UpdateSalesDB.Click += UpdateSalesDB_Click;
+            AddSalesDB.Dock = DockStyle.Right;
+            AddSalesDB.Location = new Point(605, 3);
+            AddSalesDB.Name = "AddSalesDB";
+            AddSalesDB.Size = new Size(148, 30);
+            AddSalesDB.TabIndex = 1;
+            AddSalesDB.Text = "Добавить";
+            AddSalesDB.UseVisualStyleBackColor = true;
+            AddSalesDB.Click += AddSalesDB_Click;
             // 
             // SalesContracts
             // 
@@ -141,6 +140,7 @@
             Name = "SalesContracts";
             Size = new Size(923, 438);
             Load += SalesContracts_Load;
+            VisibleChanged += SalesContracts_VisibleChanged;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)Salesdb).EndInit();
@@ -156,6 +156,6 @@
         private DataGridView Salesdb;
         private TableLayoutPanel tableLayoutPanel2;
         private Button SaveSelesDB;
-        private Button UpdateSalesDB;
+        private Button AddSalesDB;
     }
 }

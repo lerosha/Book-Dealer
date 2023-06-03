@@ -87,13 +87,12 @@
             Suppludb.Dock = DockStyle.Fill;
             Suppludb.Location = new Point(3, 90);
             Suppludb.Name = "Suppludb";
+            Suppludb.ReadOnly = true;
             Suppludb.RowHeadersWidth = 51;
             Suppludb.RowTemplate.Height = 29;
             Suppludb.Size = new Size(911, 300);
             Suppludb.TabIndex = 2;
             Suppludb.CellContentClick += Suppludb_CellContentClick;
-            Suppludb.CellValueChanged += Suppludb_CellValueChanged;
-            Suppludb.UserAddedRow += Suppludb_UserAddedRow;
             // 
             // tableLayoutPanel2
             // 
@@ -129,7 +128,7 @@
             UpdateSupplyDB.Name = "UpdateSupplyDB";
             UpdateSupplyDB.Size = new Size(148, 29);
             UpdateSupplyDB.TabIndex = 1;
-            UpdateSupplyDB.Text = "Обновить таблицу";
+            UpdateSupplyDB.Text = "Добавить";
             UpdateSupplyDB.UseVisualStyleBackColor = true;
             UpdateSupplyDB.Click += UpdateSupplyDB_Click;
             // 
@@ -141,6 +140,7 @@
             Name = "SupplyContracts";
             Size = new Size(917, 432);
             Load += SupplyContracts_Load;
+            VisibleChanged += SupplyContracts_VisibleChanged;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)Suppludb).EndInit();

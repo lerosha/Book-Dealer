@@ -1,5 +1,8 @@
-﻿using Microsoft.VisualBasic;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.VisualBasic;
+using NodaTime;
 using Npgsql;
+using NPOI.XWPF.UserModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,17 +19,16 @@ namespace BookDealer.CustomControls
     public partial class SalesContracts : UserControl
     {
         private NpgsqlConnection? connection = null;
-        private NpgsqlCommandBuilder? commandBuilder = null;
+        //private NpgsqlCommandBuilder? commandBuilder = null;
         private NpgsqlDataAdapter? dataAdapter = null;
         private DataSet? dataSet = null;
         private string table = "salescontracts";
-        private string tableID = "contractid";
-        private int columns = 5;
+        private string tableid = "contractid";
 
-        private bool newRowAdding = false;
         public SalesContracts()
         {
             InitializeComponent();
+            this.VisibleChanged += SalesContracts_VisibleChanged;
         }
 
         private void FromSalesButton_Click(object sender, EventArgs e)
@@ -36,25 +38,37 @@ namespace BookDealer.CustomControls
             ContractsControl contractsControl = parentForm.Controls.Find("contractsControl1", true).FirstOrDefault() as ContractsControl;
             contractsControl.Visible = true;
         }
-
         public void LoadData()
         {
             try
             {
-                dataAdapter = new NpgsqlDataAdapter("SELECT *, 'Удалить' as delete FROM " + table, connection);
+                string query = "SELECT s.contractid, s.information, s.date, i.sum AS total, c.name || ' ' || c.surname AS client, l.name || ' ' || l.surname AS seller, i.number AS invoicenumber, i.payment AS paid, i.shipment AS dispatched, " +
+               "'Редактировать' AS Edit " +
+               "FROM salescontracts AS s " +
+               "JOIN salesinvoices AS i ON i.contractid = s.contractid " +
+               "JOIN clients AS c ON s.clienstid = c.clientsid " +
+               "JOIN sellers AS l ON s.sellerid = l.sellerid";
 
-                commandBuilder = new NpgsqlCommandBuilder(dataAdapter);
-                dataAdapter.UpdateCommand = commandBuilder.GetUpdateCommand();
-                dataAdapter.DeleteCommand = commandBuilder.GetDeleteCommand();
-                dataAdapter.InsertCommand = commandBuilder.GetInsertCommand();
+                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(command);
+                dataAdapter = adapter;
 
                 dataSet = new DataSet();
 
-                dataAdapter.Fill(dataSet, table);
+                dataAdapter.Fill(dataSet, "Result");
 
-                Salesdb.DataSource = dataSet.Tables[table];
+                foreach (DataRow row in dataSet.Tables["Result"].Rows)
+                {
+                    int contractId = Convert.ToInt32(row["contractid"]);
+                    decimal totalSum = CalculateTotalSum(contractId);
+                    row["total"] = totalSum;
+                }
 
-                Salesdb.DataBindingComplete += DataBindingComplete;
+                BindingSource bindingSource = new BindingSource();
+                bindingSource.DataSource = dataSet.Tables["Result"];
+                Salesdb.DataSource = bindingSource;
+                Salesdb.Columns[tableid].Visible = false;
+                Salesdb.Sort(Salesdb.Columns["contractid"], ListSortDirection.Ascending);
 
             }
             catch (Exception ex)
@@ -63,39 +77,25 @@ namespace BookDealer.CustomControls
             }
         }
 
-        public void ReLoadData()
+        private decimal CalculateTotalSum(int contractId)
         {
-            try
+            string sumQuery = "SELECT SUM(sum) FROM orders WHERE contractid = @contractid";
+            using (NpgsqlCommand sumCommand = new NpgsqlCommand(sumQuery, connection))
             {
-                dataSet.Tables[table].Clear();
+                sumCommand.Parameters.AddWithValue("@contractid", contractId);
+                object result = sumCommand.ExecuteScalar();
 
-                dataAdapter.Fill(dataSet, table);
-
-                Salesdb.DataSource = dataSet.Tables[table];
-
-                Salesdb.DataBindingComplete += DataBindingComplete;
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Ошибка ReLoadData!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
-        {
-            for (int i = 0; i < Salesdb.Rows.Count; i++)
-            {
-                DataGridViewLinkCell linkCell = new DataGridViewLinkCell();
-
-                Salesdb[columns, i] = linkCell;
+                if (result != DBNull.Value && result != null)
+                {
+                    return Convert.ToDecimal(result);
+                }
+                else
+                {
+                    return 0;
+                }
             }
         }
 
-        private void UpdateSalesDB_Click(object sender, EventArgs e)
-        {
-            ReLoadData();
-        }
 
         private void SalesContracts_Load(object sender, EventArgs e)
         {
@@ -105,75 +105,130 @@ namespace BookDealer.CustomControls
             LoadData();
         }
 
+        private void OpenCustomControl(int editrowId)
+        {
+            try
+            {
+                string query = "SELECT s.contractid, s.information, s.date, i.sum AS total, c.name || ' ' || c.surname AS client, l.name || ' ' || l.surname AS seller, i.number AS invoicenumber, i.payment AS paid, i.shipment AS dispatched, " +
+               "'Редактировать' AS Edit " +
+               "FROM salescontracts AS s " +
+               "JOIN salesinvoices AS i ON i.contractid = s.contractid " +
+               "JOIN clients AS c ON s.clienstid = c.clientsid " +
+               "JOIN sellers AS l ON s.sellerid = l.sellerid " +
+                "WHERE  s." + tableid + " = @" + tableid;
+                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                command.Parameters.AddWithValue("@" + tableid, editrowId);
+
+                Salesdb.Columns[tableid].Visible = false;
+
+                NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(command);
+                DataSet dataSet = new DataSet();
+                adapter.Fill(dataSet, table);
+
+                if (dataSet.Tables[table].Rows.Count > 0)
+                {
+                    // Создать и открыть форму EditDataBooks
+                    var editform = new EditDataSalesContracts();
+
+                    string dateString = dataSet.Tables[table].Rows[0]["date"].ToString();
+                    DateTime databaseDateTime = DateTime.Parse(dateString);
+                    DateTime databaseDateOnly = databaseDateTime.Date;
+
+                    LocalDate parsedDate = LocalDate.FromDateTime(databaseDateOnly);
+                    editform.Description = dataSet.Tables[table].Rows[0]["information"].ToString();
+                    editform.Date = parsedDate.ToDateTimeUnspecified();
+                    editform.Sum = decimal.Parse(dataSet.Tables[table].Rows[0]["total"].ToString());
+                    editform.Client = dataSet.Tables[table].Rows[0]["client"].ToString();
+                    editform.Seller = dataSet.Tables[table].Rows[0]["seller"].ToString();
+                    editform.Invoiceid = dataSet.Tables[table].Rows[0]["invoicenumber"].ToString();
+                    editform.Payment = (bool)dataSet.Tables[table].Rows[0]["paid"];
+                    editform.Dispatch = (bool)dataSet.Tables[table].Rows[0]["dispatched"];
+                    DialogResult result = editform.ShowDialog();
+
+                    if (result == DialogResult.OK)
+                    {
+                        DateTime updatedDateTime = editform.Date;
+
+                        LocalDate updatedDate = LocalDate.FromDateTime(updatedDateTime);
+                        string updateddescripton = editform.Description;
+                        bool updatedpaid = editform.Payment;
+                        bool updateddispatched = editform.Dispatch;
+
+                        // Обновить базу данных с новыми значениями
+                        string updateQuery = "UPDATE salescontracts SET date = @date, information = @information WHERE " + tableid + " = @" + tableid;
+                        NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
+                        updateCommand.Parameters.AddWithValue("@date", updatedDate.ToDateTimeUnspecified());
+                        updateCommand.Parameters.AddWithValue("@information", updateddescripton);
+                        updateCommand.Parameters.AddWithValue("@" + tableid, editrowId);
+                        updateCommand.ExecuteNonQuery();
+
+                        DataRow updatedRow = dataSet.Tables[table].Rows[0];
+                        updatedRow["date"] = updatedDate.ToDateTimeUnspecified();
+                        updatedRow["information"] = updateddescripton;
+
+                        string updateQueryinvoice = "UPDATE salesinvoices SET payment = @payment, shipment = @shipment WHERE " + tableid + " = @" + tableid;
+                        NpgsqlCommand updateCommandinvoice = new NpgsqlCommand(updateQueryinvoice, connection);
+                        updateCommandinvoice.Parameters.AddWithValue("@payment", updatedpaid);
+                        updateCommandinvoice.Parameters.AddWithValue("@shipment", updateddispatched);
+                        updateCommandinvoice.Parameters.AddWithValue("@" + tableid, editrowId);
+                        updateCommandinvoice.ExecuteNonQuery();
+
+                        int rowIndex = Salesdb.SelectedCells[0].RowIndex;
+                        DataGridViewRow dataGridViewRow = Salesdb.Rows[rowIndex];
+                        dataGridViewRow.Cells["date"].Value = updatedDate.ToDateTimeUnspecified();
+                        dataGridViewRow.Cells["information"].Value = updateddescripton;
+                        dataGridViewRow.Cells["paid"].Value = updatedpaid;
+                        dataGridViewRow.Cells["dispatched"].Value = updateddispatched;
+                        // Обновите остальные ячейки в соответствии с обновлениями
+
+                        // Очистите выделение в DataGridView
+                        Salesdb.ClearSelection();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Заказ с указанным названием не найдена.", "Ошибка OpenCustomControl!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка OpenCustomControl!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        public void RefreshDataGridView()
+        {
+            string query = "SELECT s.contractid, s.information, s.date, i.sum AS total, c.name || ' ' || c.surname AS client, l.name || ' ' || l.surname AS seller, i.number AS invoicenumber, i.payment AS paid, i.shipment AS dispatched, " +
+               "'Редактировать' AS Edit " +
+               "FROM salescontracts AS s " +
+               "JOIN salesinvoices AS i ON i.contractid = s.contractid " +
+               "JOIN clients AS c ON s.clienstid = c.clientsid " +
+               "JOIN sellers AS l ON s.sellerid = l.sellerid";
+
+            NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(query, connection);
+            DataSet dataSet = new DataSet();
+            adapter.Fill(dataSet, "salescontracts");
+
+            foreach (DataRow row in dataSet.Tables["salescontracts"].Rows)
+            {
+                int contractId = Convert.ToInt32(row["contractid"]);
+                decimal totalSum = CalculateTotalSum(contractId);
+                row["total"] = totalSum;
+            }
+
+            Salesdb.DataSource = dataSet.Tables["salescontracts"];
+            Salesdb.Columns["contractid"].Visible = false;
+        }
+
         private void Suppludb_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             try
             {
-                if (e.ColumnIndex == columns && Salesdb.Rows[e.RowIndex].Cells[columns].Value != null)
+                if (e.RowIndex >= 0 && e.ColumnIndex == Salesdb.Columns["Edit"].Index)
                 {
-                    string task = Salesdb.Rows[e.RowIndex].Cells[columns].Value.ToString();
-                    if (task == "Удалить")
-                    {
-                        if (Salesdb.Columns[e.ColumnIndex].Name == "delete" && e.RowIndex >= 0)
-                        {
-                            if (MessageBox.Show("Вы уверены, что хотите удалить эту запись?", "Удаление", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                            {
-                                int id = (int)Salesdb.Rows[e.RowIndex].Cells[tableID].Value;
-                                using (NpgsqlCommand cmd = new NpgsqlCommand("DELETE FROM " + table + " WHERE " + tableID + " = @" + tableID, connection))
-                                {
-                                    cmd.Parameters.AddWithValue("@" + tableID, id);
-                                    cmd.ExecuteNonQuery();
-                                }
-                                LoadData(); // Обновляем таблицу
+                    int convar = (int)Salesdb.Rows[e.RowIndex].Cells["contractid"].Value;
+                    OpenCustomControl(convar);
 
-                            }
-
-                        }
-                    }
-                    else if (task == "Добавить")
-                    {
-                        int rowIndex = Salesdb.Rows.Count - 2;
-
-                        DataRow row = dataSet.Tables[table].NewRow();
-
-                        row["information"] = Salesdb.Rows[rowIndex].Cells["information"].Value;
-                        row["date"] = Salesdb.Rows[rowIndex].Cells["date"].Value;
-                        row["clienstid"] = Salesdb.Rows[rowIndex].Cells["clienstid"].Value;
-                        row["sellerid"] = Salesdb.Rows[rowIndex].Cells["sellerid"].Value;
-
-                        dataSet.Tables[table].Rows.Add(row);
-
-                        dataSet.Tables[table].Rows.RemoveAt(dataSet.Tables[table].Rows.Count - 2);
-
-                        Salesdb.Rows.RemoveAt(Salesdb.Rows.Count - 2);
-
-                        Salesdb.Rows[e.RowIndex].Cells[columns].Value = "Удалить";
-
-                        dataAdapter.Update(dataSet, table);
-
-                        newRowAdding = false;
-
-                    }
-                    else if (task == "Редактировать")
-                    {
-                        int r = e.RowIndex;
-
-                        DataRow row = dataSet.Tables[table].Rows[r];
-
-                        row.BeginEdit();
-                        row["name"] = Salesdb.Rows[r].Cells["name"].Value;
-                        row["date"] = Salesdb.Rows[r].Cells["date"].Value;
-                        row["clientsid"] = Salesdb.Rows[r].Cells["clientsid"].Value;
-                        row["sellerid"] = Salesdb.Rows[r].Cells["sellerid"].Value;
-                        row.EndEdit();
-
-                        dataAdapter.Update(dataSet, table);
-                        Salesdb.Rows[e.RowIndex].Cells[columns].Value = "Удалить";
-                        ReLoadData();
-
-                    }
                 }
-
             }
             catch (Exception ex)
             {
@@ -181,122 +236,75 @@ namespace BookDealer.CustomControls
             }
         }
 
-        private void Suppludb_UserAddedRow(object sender, DataGridViewRowEventArgs e)
+        public void GenerateWordDocument(DataGridView dataGridView)
         {
-            try
+            // Создание нового документа Word
+            XWPFDocument document = new XWPFDocument();
+
+            // Создание таблицы в документе
+            XWPFTable table = document.CreateTable(dataGridView.Rows.Count, dataGridView.Columns.Count - 1);
+
+            // Заполнение заголовков таблицы
+            XWPFTableRow headerRow = table.GetRow(0);
+            for (int i = 0; i < dataGridView.Columns.Count - 1; i++)
             {
-                if (newRowAdding == false)
-                {
-                    newRowAdding = true;
-
-                    int lastRow = Salesdb.Rows.Count - 2;
-
-                    DataGridViewRow row = Salesdb.Rows[lastRow];
-
-                    DataGridViewLinkCell linkCell = new DataGridViewLinkCell();
-
-                    Salesdb[columns, lastRow] = linkCell;
-
-                    row.Cells["delete"].Value = "Добавить";
-
-                }
-
+                string headerText = dataGridView.Columns[i].HeaderText;
+                headerRow.GetCell(i).SetText(headerText);
             }
-            catch (Exception ex)
+
+            // Заполнение таблицы данными из DataGridView
+            for (int i = 0; i < dataGridView.Rows.Count - 1; i++)
             {
-                MessageBox.Show(ex.Message, "Ошибка UserAddedRow!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                XWPFTableRow row = table.GetRow(i + 1);
+                for (int j = 0; j < dataGridView.Columns.Count - 1; j++)
+                {
+                    string cellValue = dataGridView.Rows[i].Cells[j].Value?.ToString() ?? string.Empty;
+                    row.GetCell(j).SetText(cellValue);
+                }
+            }
+
+            // Отображение диалогового окна выбора пути сохранения файла
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Документ Word (*.docx)|*.docx";
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                // Сохранение документа в выбранный путь
+                using (FileStream fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create, FileAccess.Write))
+                {
+                    document.Write(fileStream);
+                }
             }
         }
 
-        private void Suppludb_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        private void OpenAddDataForm()
         {
-            try
-            {
-                if (newRowAdding == false)
-                {
-                    int rowIndex = Salesdb.SelectedCells[0].RowIndex;
-
-                    DataGridViewRow editingRow = Salesdb.Rows[rowIndex];
-
-                    DataGridViewLinkCell linkCell = new DataGridViewLinkCell();
-
-                    Salesdb[columns, rowIndex] = linkCell;
-
-                    editingRow.Cells["delete"].Value = "Редактировать";
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Ошибка CellValueChanged!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            var addDataSC = new AddDataSalesContracts();
+            addDataSC.DataAdded += AddDataForm_DataAdded;
+            addDataSC.ShowDialog();
         }
-
-        private int[] GetMaxLengths()
+        private void AddDataForm_DataAdded(object sender, EventArgs e)
         {
-            int[] maxLengths = new int[Salesdb.Columns.Count];
-
-            for (int i = 0; i < Salesdb.Columns.Count; i++)
-            {
-                int maxLength = Salesdb.Columns[i].HeaderText.Length;
-                foreach (DataGridViewRow row in Salesdb.Rows)
-                {
-                    if (row.Cells[i].Value != null)
-                    {
-                        int cellLength = row.Cells[i].Value.ToString().Length;
-                        if (cellLength > maxLength)
-                        {
-                            maxLength = cellLength;
-                        }
-                    }
-                }
-                maxLengths[i] = maxLength;
-            }
-
-            return maxLengths;
-        }
-
-
-        private void SavetoFile(string filename)
-        {
-            FileStream fs = new FileStream(@"C:\Users\jbunk\Desktop\учебные пособия\базы данных\BookDealer\BookDealer\reports\" + filename, FileMode.Create);
-            StreamWriter streamWriter = new StreamWriter(fs);
-
-            try
-            {
-                int[] maxLengths = GetMaxLengths();
-
-                for (int j = 0; j < Salesdb.Rows.Count; j++)
-                {
-                    for (int i = 0; i < Salesdb.Columns.Count - 1; i++)
-                    {
-                        string cellValue = (Salesdb[i, j].Value ?? "").ToString();
-
-                        string formattedCellValue = string.Format("{0,-" + maxLengths[i] + "}", cellValue);
-
-                        streamWriter.Write(formattedCellValue);
-                        if (i < Salesdb.Columns.Count - 1)
-                        {
-                            streamWriter.Write("    ");
-                        }
-                    }
-                    streamWriter.WriteLine();
-                }
-
-                streamWriter.Close();
-                fs.Close();
-
-                MessageBox.Show("Report saved!");
-            }
-            catch
-            {
-                MessageBox.Show("Cannot save report!");
-            }
+            // Обновление данных в DataGridView
+            RefreshDataGridView();
         }
 
         private void SaveSelesDB_Click(object sender, EventArgs e)
         {
-            string s = Interaction.InputBox("Save as..", "Save", "SalesContracts.txt");
-            SavetoFile(s);
+            GenerateWordDocument(Salesdb);
+        }
+
+        private void AddSalesDB_Click(object sender, EventArgs e)
+        {
+            OpenAddDataForm();
+            Salesdb.Sort(Salesdb.Columns[tableid], ListSortDirection.Ascending);
+        }
+
+        private void SalesContracts_VisibleChanged(object sender, EventArgs e)
+        {
+            if (this.Visible)
+            {
+                RefreshDataGridView();
+            }
         }
     }
 }

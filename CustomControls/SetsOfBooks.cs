@@ -39,7 +39,7 @@ namespace BookDealer.CustomControls
         {
             try
             {
-                string query = "SELECT s.setid, s.count, s.sum, sc.information AS salescontract, b.name AS book, " +
+                string query = "SELECT s.setid, s.count, s.sum, sc.information AS supplycontract, b.name AS book, " +
                     "'Редактировать' AS Edit " +
                "FROM setsofbooks AS s " +
                "JOIN supplycontracts AS sc ON s.contractid = sc.contractid " +
@@ -117,7 +117,7 @@ namespace BookDealer.CustomControls
         {
             try
             {
-                string query = "SELECT s.setid, s.count, s.sum, sc.information AS salescontract, b.name AS book, " +
+                string query = "SELECT s.setid, s.count, s.sum, sc.information AS supplycontract, b.name AS book, " +
                     "'Редактировать' AS Edit " +
                "FROM setsofbooks AS s " +
                "JOIN supplycontracts AS sc ON s.contractid = sc.contractid " +
@@ -137,7 +137,7 @@ namespace BookDealer.CustomControls
                     editDataSoB.orderId = int.Parse(dataSet.Tables["setsofbooks"].Rows[0]["setid"].ToString());
                     editDataSoB.count = int.Parse(dataSet.Tables["setsofbooks"].Rows[0]["count"].ToString());
                     editDataSoB.sum = int.Parse(dataSet.Tables["setsofbooks"].Rows[0]["sum"].ToString());
-                    editDataSoB.saleCon = dataSet.Tables["setsofbooks"].Rows[0]["salescontract"].ToString();
+                    editDataSoB.saleCon = dataSet.Tables["setsofbooks"].Rows[0]["supplycontract"].ToString();
                     editDataSoB.bookName = dataSet.Tables["setsofbooks"].Rows[0]["book"].ToString();
                     // Продолжите добавлять остальные параметры книги в форму EditDataBooks
 
@@ -199,7 +199,7 @@ namespace BookDealer.CustomControls
 
         public void RefreshDataGridView()
         {
-            string query = "SELECT s.setid, s.count, s.sum, sc.information AS salescontract, b.name AS book, " +
+            string query = "SELECT s.setid, s.count, s.sum, sc.information AS supplycontract, b.name AS book, " +
                     "'Редактировать' AS Edit " +
                "FROM setsofbooks AS s " +
                "JOIN supplycontracts AS sc ON s.contractid = sc.contractid " +

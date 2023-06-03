@@ -18,6 +18,7 @@ namespace BookDealer.CustomControls
     public partial class EditDataOrders : Form
     {
         private NpgsqlConnection? connection = null;
+        private bool add = false;
         public EditDataOrders()
         {
             InitializeComponent();
@@ -74,30 +75,48 @@ namespace BookDealer.CustomControls
             NpgsqlCommand selectCommand = new NpgsqlCommand(selectQuery, connection);
             selectCommand.Parameters.AddWithValue("@orderid", OrderName);
             decimal currentCount = (int)selectCommand.ExecuteScalar();
-      
+
+            string countQuery = "SELECT count FROM storeroom WHERE bookid = @bookid";
+            NpgsqlCommand countCommand = new NpgsqlCommand(@countQuery, connection);
+            countCommand.Parameters.AddWithValue("@bookid", bookId);
+            int countStorge = (int)countCommand.ExecuteScalar();
+
             decimal newAmount = decimal.Parse(CountTextBox.Text);
 
-            if (newAmount >= currentCount)
+            if (add == false)
             {
-                string updateQuery = "UPDATE storeroom SET count = count - (@newAmount - @currentAmount) WHERE  bookid = @bookid";
-                NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
-                updateCommand.Parameters.AddWithValue("@newAmount", newAmount);
-                updateCommand.Parameters.AddWithValue("@currentAmount", currentCount);
-                updateCommand.Parameters.AddWithValue("@bookid", bookId);
-                updateCommand.ExecuteNonQuery();
+                if (newAmount >= currentCount && newAmount - currentCount <= countStorge)
+                {
+                    string updateQuery = "UPDATE storeroom SET count = count - (@newAmount - @currentAmount) WHERE  bookid = @bookid";
+                    NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
+                    updateCommand.Parameters.AddWithValue("@newAmount", newAmount);
+                    updateCommand.Parameters.AddWithValue("@currentAmount", currentCount);
+                    updateCommand.Parameters.AddWithValue("@bookid", bookId);
+                    updateCommand.ExecuteNonQuery();
+                    add = true;
+
+                }
+                else if (newAmount < currentCount)
+                {
+                    string updateQuery = "UPDATE storeroom SET count = count + (@currentAmount - @newAmount) WHERE  bookid = @bookid";
+                    NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
+                    updateCommand.Parameters.AddWithValue("@newAmount", newAmount);
+                    updateCommand.Parameters.AddWithValue("@currentAmount", currentCount);
+                    updateCommand.Parameters.AddWithValue("@bookid", bookId);
+                    updateCommand.ExecuteNonQuery();
+                    add = true;
+
+                }
+                else if (newAmount > countStorge)
+                {
+                    MessageBox.Show("Недостаточное количество книг на складе!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+             
             }
-            else
-            {
-                string updateQuery = "UPDATE storeroom SET count = count + (@currentAmount - @newAmount) WHERE  bookid = @bookid";
-                NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
-                updateCommand.Parameters.AddWithValue("@newAmount", newAmount);
-                updateCommand.Parameters.AddWithValue("@currentAmount", currentCount);
-                updateCommand.Parameters.AddWithValue("@bookid", bookId);
-                updateCommand.ExecuteNonQuery();
-            }
-            
             DialogResult = DialogResult.OK;
             Close();
+
         }
 
 

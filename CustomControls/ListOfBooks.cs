@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.Metrics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -25,6 +26,7 @@ namespace BookDealer.CustomControls
             goodsControl.Visible = true;
         }
 
+        
 
         private void SaveDataSold_Click(object sender, EventArgs e)
         {
