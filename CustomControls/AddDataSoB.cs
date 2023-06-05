@@ -82,7 +82,7 @@ namespace BookDealer.CustomControls
                 // Get the price from the instruments table
                 string priceQuery = "SELECT price FROM books WHERE bookid = @bookid";
                 NpgsqlCommand priceCommand = new NpgsqlCommand(priceQuery, connection);
-                priceCommand.Parameters.AddWithValue("@bookidbookid", bookId);
+                priceCommand.Parameters.AddWithValue("@bookid", bookId);
                 decimal price = Convert.ToDecimal(priceCommand.ExecuteScalar());
 
                 decimal total = count * price;

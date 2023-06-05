@@ -16,7 +16,7 @@ namespace BookDealer.CustomControls
     public partial class EditDataSoB : Form
     {
         private NpgsqlConnection? connection = null;
-        private int total;
+        private decimal total;
 
         public EditDataSoB()
         {
@@ -29,13 +29,13 @@ namespace BookDealer.CustomControls
             set { textBox1.Text = value.ToString(); }
         }
 
-        public int count
+        public decimal count
         {
-            get { return int.Parse(CountTextBox.Text); }
+            get { return decimal.Parse(CountTextBox.Text); }
             set { CountTextBox.Text = value.ToString(); }
         }
 
-        public int sum
+        public decimal sum
         {
             get { return total; }
             set { SumTextBox.Text = value.ToString(); }
@@ -68,15 +68,22 @@ namespace BookDealer.CustomControls
             string priceQuery = "SELECT price FROM books WHERE bookid = @bookid";
             NpgsqlCommand priceCommand = new NpgsqlCommand(priceQuery, connection);
             priceCommand.Parameters.AddWithValue("@bookid", bookId);
-            int price = Convert.ToInt32(priceCommand.ExecuteScalar());
+            decimal price = Convert.ToDecimal(priceCommand.ExecuteScalar());
             total = amount * price;
-            //текущее знач суммы
-            string selectQuery = "SELECT sum FROM setsofbooks WHERE bookid = @bookid";
-            NpgsqlCommand selectCommand = new NpgsqlCommand(selectQuery, connection);
-            selectCommand.Parameters.AddWithValue("@bookid", bookId);
-            int currentSum = (int)selectCommand.ExecuteScalar();
 
-            int newSum = total - currentSum;
+            int editSetId = int.Parse(textBox1.Text);
+            string querySet = "SELECT setid FROM setsofbooks WHERE setid = @setId";
+            NpgsqlCommand commandSet = new NpgsqlCommand(querySet, connection);
+            commandSet.Parameters.AddWithValue("@setId", editSetId);
+            int setId = Convert.ToInt32(commandSet.ExecuteScalar());
+
+            //текущее знач суммы
+            string selectQuery = "SELECT sum FROM setsofbooks WHERE setid = @setid";
+            NpgsqlCommand selectCommand = new NpgsqlCommand(selectQuery, connection);
+            selectCommand.Parameters.AddWithValue("@setid", setId);
+            decimal currentSum = (decimal)selectCommand.ExecuteScalar();
+
+            decimal newSum = total - currentSum;
             string updateQuery = "UPDATE storeroom SET count = count + @newSum / @price WHERE  bookid = @bookid";
             NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
             updateCommand.Parameters.AddWithValue("@newSum", newSum);

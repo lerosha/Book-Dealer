@@ -135,8 +135,8 @@ namespace BookDealer.CustomControls
                     // Создать и открыть форму EditDataBooks
                     var editDataSoB = new EditDataSoB();
                     editDataSoB.orderId = int.Parse(dataSet.Tables["setsofbooks"].Rows[0]["setid"].ToString());
-                    editDataSoB.count = int.Parse(dataSet.Tables["setsofbooks"].Rows[0]["count"].ToString());
-                    editDataSoB.sum = int.Parse(dataSet.Tables["setsofbooks"].Rows[0]["sum"].ToString());
+                    editDataSoB.count = decimal.Parse(dataSet.Tables["setsofbooks"].Rows[0]["count"].ToString());
+                    editDataSoB.sum = decimal.Parse(dataSet.Tables["setsofbooks"].Rows[0]["sum"].ToString());
                     editDataSoB.saleCon = dataSet.Tables["setsofbooks"].Rows[0]["supplycontract"].ToString();
                     editDataSoB.bookName = dataSet.Tables["setsofbooks"].Rows[0]["book"].ToString();
                     // Продолжите добавлять остальные параметры книги в форму EditDataBooks
