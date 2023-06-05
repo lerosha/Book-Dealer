@@ -61,6 +61,10 @@ namespace BookDealer.CustomControls
                 Storagedb.Columns["collectbooksid"].Visible = false;
                 Storagedb.Sort(Storagedb.Columns["collectbooksid"], ListSortDirection.Ascending);
 
+                Storagedb.Columns["count"].HeaderText = "Количество";
+                Storagedb.Columns["book"].HeaderText = "Книга";
+                Storagedb.Columns["Edit"].HeaderText = "Редактировать";
+
             }
             catch (Exception ex)
             {

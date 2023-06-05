@@ -70,6 +70,16 @@ namespace BookDealer.CustomControls
                 Salesdb.Columns[tableid].Visible = false;
                 Salesdb.Sort(Salesdb.Columns["contractid"], ListSortDirection.Ascending);
 
+                Salesdb.Columns["information"].HeaderText = "Информация";
+                Salesdb.Columns["date"].HeaderText = "Дата";
+                Salesdb.Columns["total"].HeaderText = "Итог.сумма";
+                Salesdb.Columns["client"].HeaderText = "Клиент";
+                Salesdb.Columns["seller"].HeaderText = "Продавец";
+                Salesdb.Columns["invoicenumber"].HeaderText = "Номер счета";
+                Salesdb.Columns["paid"].HeaderText = "Оплачено";
+                Salesdb.Columns["dispatched"].HeaderText = "Отгружено";
+                Salesdb.Columns["Edit"].HeaderText = "Редактировать";
+
             }
             catch (Exception ex)
             {
@@ -246,7 +256,7 @@ namespace BookDealer.CustomControls
 
             // Заполнение заголовков таблицы
             XWPFTableRow headerRow = table.GetRow(0);
-            for (int i = 0; i < dataGridView.Columns.Count - 1; i++)
+            for (int i = 1; i < dataGridView.Columns.Count - 1; i++)
             {
                 string headerText = dataGridView.Columns[i].HeaderText;
                 headerRow.GetCell(i).SetText(headerText);
@@ -256,7 +266,7 @@ namespace BookDealer.CustomControls
             for (int i = 0; i < dataGridView.Rows.Count - 1; i++)
             {
                 XWPFTableRow row = table.GetRow(i + 1);
-                for (int j = 0; j < dataGridView.Columns.Count - 1; j++)
+                for (int j = 1; j < dataGridView.Columns.Count - 1; j++)
                 {
                     string cellValue = dataGridView.Rows[i].Cells[j].Value?.ToString() ?? string.Empty;
                     row.GetCell(j).SetText(cellValue);

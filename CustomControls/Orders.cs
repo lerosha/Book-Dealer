@@ -60,6 +60,14 @@ namespace BookDealer.CustomControls
                 Setsdb.DataSource = bindingSource;
                 Setsdb.Sort(Setsdb.Columns["orderid"], ListSortDirection.Ascending);
 
+                Setsdb.Columns["orderid"].HeaderText = "Номер заказа";
+                Setsdb.Columns["date"].HeaderText = "Дата";
+                Setsdb.Columns["count"].HeaderText = "Количество";
+                Setsdb.Columns["sum"].HeaderText = "Сумма";
+                Setsdb.Columns["salescontract"].HeaderText = "Договор";
+                Setsdb.Columns["book"].HeaderText = "Книга";
+                Setsdb.Columns["Edit"].HeaderText = "Редактировать";
+
             }
             catch (Exception ex)
             {

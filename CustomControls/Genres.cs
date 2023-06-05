@@ -37,8 +37,8 @@ namespace BookDealer.CustomControls
         {
             try
             {
-                string query = "SELECT * " +
-               "FROM genres";
+                string query = "SELECT g.genreid, g.name " +
+               "FROM genres AS g";
 
                 NpgsqlCommand command = new NpgsqlCommand(query, connection);
                 NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(command);
@@ -53,6 +53,8 @@ namespace BookDealer.CustomControls
                 dataGridView1.DataSource = bindingSource;
                 dataGridView1.Columns["genreid"].Visible = false;
                 dataGridView1.Sort(dataGridView1.Columns["genreid"], ListSortDirection.Ascending);
+
+                dataGridView1.Columns["name"].HeaderText = "Название";
 
             }
             catch (Exception ex)

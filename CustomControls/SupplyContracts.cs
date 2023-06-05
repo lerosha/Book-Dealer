@@ -69,6 +69,15 @@ namespace BookDealer.CustomControls
                 Suppludb.Columns[tableid].Visible = false;
                 Suppludb.Sort(Suppludb.Columns[tableid], ListSortDirection.Ascending);
 
+                Suppludb.Columns["information"].HeaderText = "Информация";
+                Suppludb.Columns["date"].HeaderText = "Дата";
+                Suppludb.Columns["total"].HeaderText = "Итог.сумма";
+                Suppludb.Columns["supplier"].HeaderText = "Поставщик";
+                Suppludb.Columns["invoicenumber"].HeaderText = "Номер счета";
+                Suppludb.Columns["paid"].HeaderText = "Оплачено";
+                Suppludb.Columns["dispatched"].HeaderText = "Отгружено";
+                Suppludb.Columns["Edit"].HeaderText = "Редактировать";
+
             }
             catch (Exception ex)
             {

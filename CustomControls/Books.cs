@@ -54,6 +54,14 @@ namespace BookDealer.CustomControls
                 Booksdb.Columns["bookid"].Visible = false;
                 Booksdb.Sort(Booksdb.Columns["bookid"], ListSortDirection.Ascending);
 
+                Booksdb.Columns["name"].HeaderText = "Название";
+                Booksdb.Columns["price"].HeaderText = "Цена";
+                Booksdb.Columns["author"].HeaderText = "Автор";
+                Booksdb.Columns["publisher"].HeaderText = "Издательство";
+                Booksdb.Columns["genre"].HeaderText = "Жанр";
+                Booksdb.Columns["provider"].HeaderText = "Поставщик";
+                Booksdb.Columns["Edit"].HeaderText = "Редактировать";
+
             }
             catch (Exception ex)
             {

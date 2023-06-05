@@ -60,6 +60,13 @@ namespace BookDealer
                 Clientsdb.Columns["clientsid"].Visible = false;
                 Clientsdb.Sort(Clientsdb.Columns["clientsid"], ListSortDirection.Ascending);
 
+                Clientsdb.Columns["name"].HeaderText = "Имя";
+                Clientsdb.Columns["surname"].HeaderText = "Фамилия";
+                Clientsdb.Columns["middlename"].HeaderText = "Отчество";
+                Clientsdb.Columns["bankaccount"].HeaderText = "Счет";
+                Clientsdb.Columns["address"].HeaderText = "Адрес";
+                Clientsdb.Columns["Edit"].HeaderText = "Редактировать";
+
             }
             catch (Exception ex)
             {
@@ -274,6 +281,12 @@ namespace BookDealer
                 Publishersdb.Columns["publisherid"].Visible = false;
                 Publishersdb.Sort(Publishersdb.Columns["publisherid"], ListSortDirection.Ascending);
 
+                Publishersdb.Columns["name"].HeaderText = "Имя";
+                Publishersdb.Columns["address"].HeaderText = "Адрес";
+                Publishersdb.Columns["director"].HeaderText = "Директор";
+                Publishersdb.Columns["bankaccount"].HeaderText = "Счет";
+                Publishersdb.Columns["Edit"].HeaderText = "Редактировать";
+
             }
             catch (Exception ex)
             {
@@ -433,6 +446,10 @@ namespace BookDealer
                 Providersdb.Columns["providerid"].Visible = false;
                 Providersdb.Sort(Providersdb.Columns["providerid"], ListSortDirection.Ascending);
 
+                Providersdb.Columns["name"].HeaderText = "Название";
+                Providersdb.Columns["address"].HeaderText = "Адрес";
+                Providersdb.Columns["Edit"].HeaderText = "Редактировать";
+
             }
             catch (Exception ex)
             {
@@ -580,6 +597,12 @@ namespace BookDealer
                 Sellersdb.DataSource = bindingSource;
                 Sellersdb.Columns["sellerid"].Visible = false;
                 Sellersdb.Sort(Sellersdb.Columns["sellerid"], ListSortDirection.Ascending);
+
+                Sellersdb.Columns["name"].HeaderText = "Имя";
+                Sellersdb.Columns["surname"].HeaderText = "Фамилия";
+                Sellersdb.Columns["middlename"].HeaderText = "Отчество";
+                Sellersdb.Columns["salary"].HeaderText = "Зарплата";
+                Sellersdb.Columns["Edit"].HeaderText = "Редактировать";
 
             }
             catch (Exception ex)
