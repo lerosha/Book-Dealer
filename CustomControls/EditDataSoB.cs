@@ -53,6 +53,14 @@ namespace BookDealer.CustomControls
             set { BookNameTextBox.Text = value; }
         }
 
+        private int GetSupConIdByName(string saleCon)
+        {
+            string query = "SELECT contractid FROM supplycontracts WHERE information = @information";
+            NpgsqlCommand command = new NpgsqlCommand(query, connection);
+            command.Parameters.AddWithValue("@information", saleCon);
+            int supConId = Convert.ToInt32(command.ExecuteScalar());
+            return supConId;
+        }
 
         private void btnOK_Click(object sender, EventArgs e)
         {
@@ -84,13 +92,33 @@ namespace BookDealer.CustomControls
             decimal currentSum = (decimal)selectCommand.ExecuteScalar();
 
             decimal newSum = total - currentSum;
-            string updateQuery = "UPDATE storeroom SET count = count + @newSum / @price WHERE  bookid = @bookid";
-            NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
-            updateCommand.Parameters.AddWithValue("@newSum", newSum);
-            updateCommand.Parameters.AddWithValue("@price", price);
-            updateCommand.Parameters.AddWithValue("@bookid", bookId);
-            updateCommand.ExecuteNonQuery();
 
+            int supConId = GetSupConIdByName(saleCon);
+
+            string checkQuery = "SELECT payment, shipment FROM supplyinvoices WHERE contractid = @contractid";
+            NpgsqlCommand checkCommand = new NpgsqlCommand(checkQuery, connection);
+            checkCommand.Parameters.AddWithValue("@contractid", supConId);
+            NpgsqlDataReader reader = checkCommand.ExecuteReader();
+
+            bool paid = false;
+            bool dispatched = false;
+            if (reader.Read())
+            {
+                paid = reader.GetBoolean(0);
+                dispatched = reader.GetBoolean(1);
+            }
+            reader.Close();
+
+            if (paid && dispatched)
+            {
+                string updateQuery = "UPDATE storeroom SET count = count + @newSum / @price WHERE  bookid = @bookid";
+                NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
+                updateCommand.Parameters.AddWithValue("@newSum", newSum);
+                updateCommand.Parameters.AddWithValue("@price", price);
+                updateCommand.Parameters.AddWithValue("@bookid", bookId);
+                updateCommand.ExecuteNonQuery();
+            }
+            
             DialogResult = DialogResult.OK;
             Close();
         }

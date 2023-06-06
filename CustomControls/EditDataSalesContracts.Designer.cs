@@ -239,6 +239,7 @@
             Controls.Add(textBox1);
             Name = "EditDataSalesContracts";
             Text = "EditDataSalesContracts";
+            Load += EditDataSalesContracts_Load;
             ResumeLayout(false);
             PerformLayout();
         }

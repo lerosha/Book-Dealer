@@ -217,6 +217,7 @@
             Controls.Add(textBox1);
             Name = "EditDataSupplyContracts";
             Text = "EditDataSupplyContracts";
+            Load += EditDataSupplyContracts_Load;
             ResumeLayout(false);
             PerformLayout();
         }

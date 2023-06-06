@@ -43,32 +43,54 @@ namespace BookDealer.CustomControls
             return bookId;
         }
 
-        private void SubtractFromStoreroom(int subtractCount, int bookid)
+        private void SubtractFromStoreroom(int subtractCount, int bookid, int salesConId)
         {
             try
             {
-                // Получить текущее значение из поля count в таблице storeroom
-                string selectQuery = "SELECT count FROM storeroom WHERE bookid = @bookid";
-                NpgsqlCommand selectCommand = new NpgsqlCommand(selectQuery, connection);
-                selectCommand.Parameters.AddWithValue("@bookid", bookid);
-                decimal currentCount = (int)selectCommand.ExecuteScalar();
+                string checkQuery = "SELECT payment, shipment FROM salesinvoices WHERE contractid = @contractid";
+                NpgsqlCommand checkCommand = new NpgsqlCommand(checkQuery, connection);
+                checkCommand.Parameters.AddWithValue("@contractid", salesConId);
+                NpgsqlDataReader reader = checkCommand.ExecuteReader();
 
-                // Проверить, есть ли достаточное количество для вычитания
-                if (currentCount >= subtractCount)
+                bool paid = false;
+                //bool dispatched = false;
+                if (reader.Read())
                 {
-                    string updateQuery = "UPDATE storeroom SET count = count - @subtractCount WHERE bookid = @bookid";
-                    NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
-                    updateCommand.Parameters.AddWithValue("@subtractCount", subtractCount);
-                    updateCommand.Parameters.AddWithValue("@bookid", bookid);
-                    updateCommand.ExecuteNonQuery();
-                    isEnough = true;
+                    paid = reader.GetBoolean(0);
+                    //dispatched = reader.GetBoolean(1);
+                }
+                reader.Close();
 
+                if (paid)
+                {
+                    // Получить текущее значение из поля count в таблице storeroom
+                    string selectQuery = "SELECT count FROM storeroom WHERE bookid = @bookid";
+                    NpgsqlCommand selectCommand = new NpgsqlCommand(selectQuery, connection);
+                    selectCommand.Parameters.AddWithValue("@bookid", bookid);
+                    decimal currentCount = (int)selectCommand.ExecuteScalar();
+
+                    // Проверить, есть ли достаточное количество для вычитания
+                    if (currentCount >= subtractCount)
+                    {
+                        string updateQuery = "UPDATE storeroom SET count = count - @subtractCount WHERE bookid = @bookid";
+                        NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
+                        updateCommand.Parameters.AddWithValue("@subtractCount", subtractCount);
+                        updateCommand.Parameters.AddWithValue("@bookid", bookid);
+                        updateCommand.ExecuteNonQuery();
+                        isEnough = true;
+
+                    }
+                    else
+                    {
+                        isEnough = false;
+
+                    }
                 }
                 else
                 {
-                    isEnough = false;
 
                 }
+                
 
             }
             catch (Exception ex)
@@ -93,7 +115,22 @@ namespace BookDealer.CustomControls
                 int bookId = GetGenreIdByName(bookName);
 
                 int subtractCount = int.Parse(CountTextBox.Text);
-                SubtractFromStoreroom(subtractCount, bookId);
+
+                SubtractFromStoreroom(subtractCount, bookId, salesConId);
+
+                string checkQuery = "SELECT payment, shipment FROM salesinvoices WHERE contractid = @contractid";
+                NpgsqlCommand checkCommand = new NpgsqlCommand(checkQuery, connection);
+                checkCommand.Parameters.AddWithValue("@contractid", salesConId);
+                NpgsqlDataReader reader = checkCommand.ExecuteReader();
+
+                bool paid = false;
+                //bool dispatched = false;
+                if (reader.Read())
+                {
+                    paid = reader.GetBoolean(0);
+                    //dispatched = reader.GetBoolean(1);
+                }
+                reader.Close();
 
                 if (isEnough == true)
                 {
@@ -108,10 +145,24 @@ namespace BookDealer.CustomControls
                     insertCommand.ExecuteNonQuery();
                     MessageBox.Show("Заказ успешно оформлен!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                else if (isEnough == false)
+                else if (isEnough == false && paid)
                 {
                     MessageBox.Show("Недостаточное количество книг на складе!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+                else if (isEnough == false && paid == false)
+                {
+                    // Вставить новую запись в таблицу
+                    string insertQuery = "INSERT INTO orders (date, count, sum, contractid, bookid) VALUES (@date, @count, @sum, @contractid, @bookid)";
+                    NpgsqlCommand insertCommand = new NpgsqlCommand(insertQuery, connection);
+                    insertCommand.Parameters.AddWithValue("@date", localTime.ToDateTimeUnspecified());
+                    insertCommand.Parameters.AddWithValue("@count", orderCount);
+                    insertCommand.Parameters.AddWithValue("@sum", orderSum);
+                    insertCommand.Parameters.AddWithValue("@contractid", salesConId);
+                    insertCommand.Parameters.AddWithValue("@bookid", bookId);
+                    insertCommand.ExecuteNonQuery();
+                    MessageBox.Show("Заказ успешно оформлен!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
                 // Обновить отображение в DataGridView
                 DataAdded?.Invoke(this, EventArgs.Empty);
                 Close();

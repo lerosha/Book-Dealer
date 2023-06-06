@@ -43,22 +43,40 @@ namespace BookDealer.CustomControls
             return bookId;
         }
 
-        private void AddToStorage(int addCount, int bookId)
+        private void AddToStorage(int addCount, int bookId, int supCon)
         {
             try
             {
-                // Получить текущее значение из поля count в таблице storeroom
-                string selectQuery = "SELECT count FROM storeroom";
-                NpgsqlCommand selectCommand = new NpgsqlCommand(selectQuery, connection);
-                decimal currentCount = (int)selectCommand.ExecuteScalar();
+                string checkQuery = "SELECT payment, shipment FROM supplyinvoices WHERE contractid = @contractid";
+                NpgsqlCommand checkCommand = new NpgsqlCommand(checkQuery, connection);
+                checkCommand.Parameters.AddWithValue("@contractid", supCon);
+                NpgsqlDataReader reader = checkCommand.ExecuteReader();
 
-                // Проверить, есть ли достаточное количество для вычитания
+                bool paid = false;
+                bool dispatched = false;
+                if (reader.Read())
+                {
+                    paid = reader.GetBoolean(0);
+                    dispatched = reader.GetBoolean(1);
+                }
+                reader.Close();
 
-                string updateQuery = "UPDATE storeroom SET count = count + @addCount WHERE  bookid = @bookid";
-                NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
-                updateCommand.Parameters.AddWithValue("@addCount", addCount);
-                updateCommand.Parameters.AddWithValue("@bookid", bookId);
-                updateCommand.ExecuteNonQuery();
+                if (paid && dispatched)
+                {
+                    // Получить текущее значение из поля count в таблице storeroom
+                    string selectQuery = "SELECT count FROM storeroom";
+                    NpgsqlCommand selectCommand = new NpgsqlCommand(selectQuery, connection);
+                    decimal currentCount = (int)selectCommand.ExecuteScalar();
+
+                    // Проверить, есть ли достаточное количество для вычитания
+
+                    string updateQuery = "UPDATE storeroom SET count = count + @addCount WHERE  bookid = @bookid";
+                    NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
+                    updateCommand.Parameters.AddWithValue("@addCount", addCount);
+                    updateCommand.Parameters.AddWithValue("@bookid", bookId);
+                    updateCommand.ExecuteNonQuery();
+                }
+                
 
             }
             catch (Exception ex)
@@ -88,7 +106,7 @@ namespace BookDealer.CustomControls
                 decimal total = count * price;
 
                 int addCount = int.Parse(countTextBox.Text);
-                AddToStorage(addCount, bookId);
+                AddToStorage(addCount, bookId, suoConId);
 
                 // Вставить новую запись в таблицу
                 string insertQuery = "INSERT INTO setsofbooks (count, sum, contractid, bookid) VALUES (@count, @sum, @contractid, @bookid)";
